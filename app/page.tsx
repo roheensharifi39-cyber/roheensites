@@ -17,6 +17,10 @@ const navItems = [
 
 const proofStrip = ["$10/month with updates", "$40 one-time", "Built and deployed live"];
 
+const contactEmail = "roheensharifi39@gmail.com";
+const contactPhone = "703-593-4536";
+const contactPhoneHref = "tel:+17035934536";
+
 const benefits = [
   {
     title: "Recruiter-ready story",
@@ -821,15 +825,18 @@ function HeroMockup() {
 
 function MobileNav() {
   const [open, setOpen] = useState(false);
+  const motionReady = useMotionReady();
+  const menuId = "mobile-navigation-menu";
 
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative grid h-10 w-10 place-items-center rounded-full border border-white/12 bg-white/[0.06] text-zinc-50 outline-none transition hover:bg-white/[0.1] focus-visible:ring-2 focus-visible:ring-sky-200 lg:hidden"
+        className="relative z-[60] grid h-10 w-10 place-items-center rounded-full border border-white/12 bg-white/[0.06] text-zinc-50 outline-none transition hover:bg-white/[0.1] focus-visible:ring-2 focus-visible:ring-sky-200 lg:hidden"
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
+        aria-controls={menuId}
       >
         <span className="relative h-4 w-5">
           <span
@@ -847,50 +854,62 @@ function MobileNav() {
         </span>
       </button>
 
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {open ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-x-0 bottom-0 top-[4.75rem] z-30 overflow-y-auto bg-[#070a11]/94 px-4 py-6 backdrop-blur-2xl lg:hidden"
-          >
+          <>
             <motion.div
-              initial="hidden"
-              animate="show"
-              exit="hidden"
-              variants={{
-                hidden: { opacity: 0, y: 18 },
-                show: {
-                  opacity: 1,
-                  y: 0,
-                  transition: { staggerChildren: 0.045, ease: [0.22, 1, 0.36, 1] },
-                },
-              }}
-              className="mx-auto max-w-sm rounded-[28px] border border-white/12 bg-white/[0.06] p-3 shadow-[0_28px_90px_rgba(0,0,0,0.4)]"
+              key="mobile-nav-backdrop"
+              aria-hidden="true"
+              initial={motionReady ? { opacity: 0 } : false}
+              animate={motionReady ? { opacity: 1 } : undefined}
+              exit={motionReady ? { opacity: 0 } : undefined}
+              transition={{ duration: 0.18 }}
+              className="fixed inset-0 z-40 bg-[#030712]/18 lg:hidden"
+              onClick={() => setOpen(false)}
+            />
+            <motion.div
+              key="mobile-nav-panel"
+              id={menuId}
+              initial={motionReady ? { opacity: 0, y: -8, scale: 0.98 } : false}
+              animate={motionReady ? { opacity: 1, y: 0, scale: 1 } : undefined}
+              exit={motionReady ? { opacity: 0, y: -6, scale: 0.98 } : undefined}
+              transition={motionReady ? { duration: 0.22, ease: [0.22, 1, 0.36, 1] } : undefined}
+              className="absolute right-0 top-[calc(100%+0.75rem)] z-[55] w-[min(calc(100vw-1.5rem),22rem)] overflow-hidden rounded-[28px] border border-white/14 bg-[#0b1019]/96 p-2 shadow-[0_28px_90px_rgba(0,0,0,0.46)] backdrop-blur-2xl lg:hidden"
             >
-              {navItems.map(([label, href]) => (
-                <motion.a
-                  key={label}
-                  href={href}
-                  variants={{
-                    hidden: { opacity: 0, y: 12 },
-                    show: { opacity: 1, y: 0 },
-                  }}
-                  onClick={() => setOpen(false)}
-                  className="block rounded-2xl px-4 py-3 text-lg font-semibold text-zinc-50 transition hover:bg-white/[0.07]"
-                >
-                  {label}
-                </motion.a>
-              ))}
-              <div className="mt-3 px-1">
-                <CTA href="#contact" onClick={() => setOpen(false)}>
-                  Start My Site
-                </CTA>
-              </div>
+              <motion.div
+                initial="hidden"
+                animate="show"
+                exit="hidden"
+                variants={{
+                  hidden: {},
+                  show: {
+                    transition: { staggerChildren: 0.035, ease: [0.22, 1, 0.36, 1] },
+                  },
+                }}
+                className="grid gap-1"
+              >
+                {navItems.map(([label, href]) => (
+                  <motion.a
+                    key={label}
+                    href={href}
+                    variants={{
+                      hidden: motionReady ? { opacity: 0, y: 8 } : {},
+                      show: motionReady ? { opacity: 1, y: 0 } : {},
+                    }}
+                    onClick={() => setOpen(false)}
+                    className="flex min-h-12 items-center rounded-[20px] px-4 text-base font-semibold text-zinc-50 transition active:scale-[0.99] active:bg-white/[0.08] hover:bg-white/[0.07]"
+                  >
+                    {label}
+                  </motion.a>
+                ))}
+                <div className="mt-2 border-t border-white/10 px-1 pt-3">
+                  <CTA href="#contact" onClick={() => setOpen(false)}>
+                    Start My Site
+                  </CTA>
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
+          </>
         ) : null}
       </AnimatePresence>
     </>
@@ -963,7 +982,7 @@ export default function Home() {
       <div className="site-grain" />
 
       <header className="sticky top-0 z-40 px-3 py-3 sm:px-5">
-        <nav className="nav-glass mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-3 rounded-full border border-white/10 bg-[#0b1019]/78 px-3 shadow-[0_18px_70px_rgba(0,0,0,0.28)] sm:h-16 sm:px-5">
+        <nav className="nav-glass relative mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-3 rounded-full border border-white/10 bg-[#0b1019]/78 px-3 shadow-[0_18px_70px_rgba(0,0,0,0.28)] sm:h-16 sm:px-5">
           <a href="#" className="flex min-w-0 items-center gap-3 font-semibold tracking-tight text-zinc-50">
             <span className="relative grid h-9 w-9 shrink-0 overflow-hidden rounded-full border border-sky-200/24 bg-[#050914] shadow-[0_0_22px_rgba(125,211,252,0.16)]">
               <Image
@@ -1260,7 +1279,14 @@ export default function Home() {
         <Reveal>
           <p className="mt-6 text-sm leading-6 text-zinc-400">
             For Venmo/Zelle, include your name and project name in the payment note. Questions before
-            paying? Email <span className="text-zinc-200">CONTACT_EMAIL_HERE</span>.
+            paying? Email{" "}
+            <a
+              href={`mailto:${contactEmail}`}
+              className="font-medium text-zinc-200 underline decoration-sky-200/30 underline-offset-4 transition hover:text-sky-100"
+            >
+              {contactEmail}
+            </a>
+            .
           </p>
         </Reveal>
       </SectionShell>
@@ -1343,12 +1369,32 @@ export default function Home() {
                   website you can share anywhere.
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <CTA href="mailto:CONTACT_EMAIL_HERE?subject=Start%20my%20portfolio%20site">
+                  <CTA href={`mailto:${contactEmail}?subject=Start%20my%20portfolio%20site`}>
                     Start My Site
                   </CTA>
-                  <CTA href="mailto:CONTACT_EMAIL_HERE?subject=Portfolio%20website%20question" variant="secondary">
+                  <CTA href={`mailto:${contactEmail}?subject=Portfolio%20website%20question`} variant="secondary">
                     Ask a Question
                   </CTA>
+                </div>
+                <div className="mt-7 grid gap-3 sm:grid-cols-2">
+                  <motion.a
+                    href={`mailto:${contactEmail}`}
+                    whileTap={mobileMotionReady ? { scale: 0.985 } : undefined}
+                    className="group rounded-[22px] border border-white/10 bg-white/[0.055] p-4 transition hover:border-sky-200/30 hover:bg-white/[0.075]"
+                  >
+                    <p className="text-sm font-semibold text-sky-200">Email</p>
+                    <p className="mt-2 break-all text-base font-semibold text-zinc-50 sm:text-lg">
+                      {contactEmail}
+                    </p>
+                  </motion.a>
+                  <motion.a
+                    href={contactPhoneHref}
+                    whileTap={mobileMotionReady ? { scale: 0.985 } : undefined}
+                    className="group rounded-[22px] border border-white/10 bg-white/[0.055] p-4 transition hover:border-sky-200/30 hover:bg-white/[0.075]"
+                  >
+                    <p className="text-sm font-semibold text-sky-200">Phone</p>
+                    <p className="mt-2 text-base font-semibold text-zinc-50 sm:text-lg">{contactPhone}</p>
+                  </motion.a>
                 </div>
               </div>
             </div>
@@ -1366,7 +1412,7 @@ export default function Home() {
             <a href="#faq" className="transition hover:text-zinc-100">
               FAQ
             </a>
-            <a href="mailto:CONTACT_EMAIL_HERE" className="transition hover:text-zinc-100">
+            <a href={`mailto:${contactEmail}`} className="transition hover:text-zinc-100">
               Contact
             </a>
           </div>
