@@ -140,21 +140,24 @@ const processSteps = [
 
 const payments = [
   {
+    brand: "stripe",
     title: "Stripe subscription/card",
     copy: "Preferred for the $10/month plan.",
     value: "STRIPE_MONTHLY_LINK_HERE",
   },
   {
+    brand: "venmo",
     title: "Venmo",
     copy: "Good for one-time sites or first payments.",
     value: "@Roheen-Sharifi",
   },
   {
+    brand: "zelle",
     title: "Zelle",
     copy: "Good for one-time sites or first payments.",
     value: "ZELLE_EMAIL_HERE",
   },
-];
+] as const;
 
 const trustBullets = [
   "Biomedical Engineering student at Virginia Tech",
@@ -543,6 +546,54 @@ function CodedMark({ tone = "cyan" }: { tone?: string }) {
       <span className="absolute left-3 top-3 h-2 w-5 rounded-full bg-current opacity-80" />
       <span className="absolute bottom-3 left-3 h-2 w-2 rounded-full bg-current opacity-55" />
       <span className="absolute bottom-3 right-3 h-2 w-3 rounded-full bg-current opacity-35" />
+    </div>
+  );
+}
+
+type PaymentBrand = (typeof payments)[number]["brand"];
+
+function PaymentSymbol({ brand }: { brand: PaymentBrand }) {
+  const symbols: Record<
+    PaymentBrand,
+    {
+      label: string;
+      mark: string;
+      shell: string;
+      text: string;
+    }
+  > = {
+    stripe: {
+      label: "Stripe",
+      mark: "stripe",
+      shell: "border-indigo-200/26 bg-indigo-400/14 shadow-[0_18px_52px_rgba(129,140,248,0.12)]",
+      text: "text-[17px] font-bold text-indigo-100",
+    },
+    venmo: {
+      label: "Venmo",
+      mark: "v",
+      shell: "border-sky-200/28 bg-sky-300/16 shadow-[0_18px_52px_rgba(56,189,248,0.12)]",
+      text: "text-[28px] font-black leading-none text-sky-50",
+    },
+    zelle: {
+      label: "Zelle",
+      mark: "Zelle",
+      shell: "border-violet-200/28 bg-violet-400/16 shadow-[0_18px_52px_rgba(167,139,250,0.12)]",
+      text: "text-[17px] font-extrabold text-violet-50",
+    },
+  };
+  const symbol = symbols[brand];
+
+  return (
+    <div
+      aria-label={`${symbol.label} payment option`}
+      className={cx(
+        "inline-flex h-11 min-w-24 items-center justify-center rounded-2xl border px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
+        symbol.shell
+      )}
+    >
+      <span aria-hidden="true" className={symbol.text}>
+        {symbol.mark}
+      </span>
     </div>
   );
 }
@@ -1195,7 +1246,7 @@ export default function Home() {
                   transition={motionReady ? { type: "spring", stiffness: 260, damping: 24 } : undefined}
                   className="h-full rounded-[24px] border border-white/10 bg-white/[0.045] p-5 sm:rounded-[28px] sm:p-6"
                 >
-                  <CodedMark tone={index === 0 ? "cyan" : index === 1 ? "violet" : "lime"} />
+                  <PaymentSymbol brand={payment.brand} />
                   <h3 className="mt-7 text-xl font-semibold text-zinc-50">{payment.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-zinc-300">{payment.copy}</p>
                   <code className="mt-6 block break-all rounded-2xl border border-white/10 bg-[#070a11] p-4 text-sm text-sky-100">
