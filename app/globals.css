@@ -97,10 +97,10 @@ body {
   pointer-events: none;
   position: absolute;
   z-index: 3;
-  width: 26px;
-  height: 26px;
-  margin-left: -13px;
-  margin-top: -13px;
+  width: 34px;
+  height: 34px;
+  margin-left: -17px;
+  margin-top: -17px;
   border-radius: 999px;
   mix-blend-mode: screen;
 }
@@ -117,22 +117,22 @@ body {
 .mobile-star-spark-ring {
   width: 100%;
   height: 100%;
-  border: 1px solid rgb(186 230 253 / 0.32);
+  border: 1px solid rgb(186 230 253 / 0.44);
   background:
-    radial-gradient(circle, rgb(125 211 252 / 0.11), transparent 58%),
-    radial-gradient(circle, rgb(168 85 247 / 0.05), transparent 72%);
+    radial-gradient(circle, rgb(125 211 252 / 0.18), transparent 58%),
+    radial-gradient(circle, rgb(168 85 247 / 0.08), transparent 72%);
   box-shadow:
-    0 0 5px rgb(125 211 252 / 0.16),
-    inset 0 0 6px rgb(186 230 253 / 0.07);
+    0 0 8px rgb(125 211 252 / 0.24),
+    inset 0 0 8px rgb(186 230 253 / 0.1);
 }
 
 .mobile-star-spark-dot {
-  width: 2px;
-  height: 2px;
-  background: rgb(248 250 252 / 0.72);
+  width: 3px;
+  height: 3px;
+  background: rgb(248 250 252 / 0.82);
   box-shadow:
-    0 0 4px rgb(125 211 252 / 0.3),
-    0 0 5px rgb(168 85 247 / 0.12);
+    0 0 5px rgb(125 211 252 / 0.42),
+    0 0 8px rgb(168 85 247 / 0.18);
 }
 
 .galaxy-nebula {
