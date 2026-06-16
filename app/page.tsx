@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import { useEffect, useState } from "react";
 import AnimatedBackground from "./components/AnimatedBackground";
@@ -913,8 +914,15 @@ export default function Home() {
       <header className="sticky top-0 z-40 px-3 py-3 sm:px-5">
         <nav className="nav-glass mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-3 rounded-full border border-white/10 bg-[#0b1019]/78 px-3 shadow-[0_18px_70px_rgba(0,0,0,0.28)] sm:h-16 sm:px-5">
           <a href="#" className="flex min-w-0 items-center gap-3 font-semibold tracking-tight text-zinc-50">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sky-300 text-sm font-black text-[#061018]">
-              R
+            <span className="relative grid h-9 w-9 shrink-0 overflow-hidden rounded-full border border-sky-200/24 bg-[#050914] shadow-[0_0_22px_rgba(125,211,252,0.16)]">
+              <Image
+                src="/images/icon.png"
+                alt=""
+                fill
+                sizes="36px"
+                className="object-cover"
+                priority
+              />
             </span>
             <span className="truncate">Sites by Roheen</span>
           </a>
