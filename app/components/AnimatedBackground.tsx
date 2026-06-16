@@ -10,9 +10,8 @@ type TapSpark = {
 };
 
 const mobileSparkOffsets = [
-  { x: 8, y: -7, delay: 0.02 },
-  { x: -9, y: 5, delay: 0.05 },
-  { x: 3, y: 9, delay: 0.08 },
+  { x: 7, y: -8, delay: 0.02 },
+  { x: -8, y: 6, delay: 0.05 },
 ] as const;
 
 function useMounted() {
@@ -29,7 +28,8 @@ function useMounted() {
 export default function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sparkIdRef = useRef(0);
-  const lastMobileTapRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const lastSparkAtRef = useRef(0);
+  const touchStartRef = useRef<{ id: number; x: number; y: number; time: number } | null>(null);
   const reduce = useReducedMotion();
   const mounted = useMounted();
   const [tapSparks, setTapSparks] = useState<TapSpark[]>([]);
@@ -67,7 +67,6 @@ export default function AnimatedBackground() {
     let width = 0;
     let height = 0;
     let pixelRatio = 1;
-    let isMobileView = false;
     const particles: Particle[] = [];
     const pulses: Pulse[] = [];
     const pointer = {
@@ -78,25 +77,23 @@ export default function AnimatedBackground() {
 
     function createParticle(): Particle {
       const warm = Math.random() > 0.54;
-      const speed = isMobileView ? 0.22 : 0.28;
       return {
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * speed,
-        vy: (Math.random() - 0.5) * speed,
-        size: isMobileView ? 0.56 + Math.random() * 2.1 : 0.65 + Math.random() * 2.9,
-        alpha: isMobileView ? 0.26 + Math.random() * 0.5 : 0.28 + Math.random() * 0.72,
+        vx: (Math.random() - 0.5) * 0.28,
+        vy: (Math.random() - 0.5) * 0.28,
+        size: 0.65 + Math.random() * 2.9,
+        alpha: 0.28 + Math.random() * 0.72,
         hue: warm ? 28 + Math.random() * 26 : 190 + Math.random() * 66,
-        drift: isMobileView ? 0.34 + Math.random() * 0.72 : 0.25 + Math.random() * 0.85,
+        drift: 0.25 + Math.random() * 0.85,
       };
     }
 
     function seedParticles() {
       particles.length = 0;
-      const minimumCount = isMobileView ? 68 : 120;
-      const maximumCount = isMobileView ? 124 : 260;
-      const density = isMobileView ? 9000 : 8200;
-      const count = Math.min(maximumCount, Math.max(minimumCount, Math.floor((width * height) / density)));
+      const minimumCount = width < 640 ? 70 : 120;
+      const maximumCount = width < 640 ? 140 : 260;
+      const count = Math.min(maximumCount, Math.max(minimumCount, Math.floor((width * height) / 8200)));
       for (let index = 0; index < count; index += 1) {
         particles.push(createParticle());
       }
@@ -106,7 +103,6 @@ export default function AnimatedBackground() {
       width = globalThis.innerWidth;
       height = globalThis.innerHeight;
       pixelRatio = Math.min(globalThis.devicePixelRatio || 1, 2);
-      isMobileView = width < 640 || globalThis.matchMedia("(pointer: coarse)").matches;
       canvas.width = Math.floor(width * pixelRatio);
       canvas.height = Math.floor(height * pixelRatio);
       canvas.style.width = `${width}px`;
@@ -116,14 +112,14 @@ export default function AnimatedBackground() {
     }
 
     function onPointerMove(event: PointerEvent) {
-      if (event.pointerType !== "mouse" || isMobileView) return;
+      if (event.pointerType !== "mouse") return;
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       pointer.active = true;
     }
 
     function onPointerDown(event: PointerEvent) {
-      if (event.pointerType !== "mouse" || isMobileView) return;
+      if (event.pointerType !== "mouse" || globalThis.matchMedia("(pointer: coarse)").matches) return;
 
       pulses.push({
         x: event.clientX,
@@ -179,17 +175,11 @@ export default function AnimatedBackground() {
         const centerDx = centerPullX - particle.x;
         const centerDy = centerPullY - particle.y;
         const centerDistance = Math.max(Math.hypot(centerDx, centerDy), 1);
-        const orbitForce = isMobileView ? 0.0024 : 0.003;
 
         particle.vx += dx * pointerForce * particle.drift * 0.0012;
         particle.vy += dy * pointerForce * particle.drift * 0.0012;
-        particle.vx += (-centerDy / centerDistance) * orbitForce * particle.drift;
-        particle.vy += (centerDx / centerDistance) * orbitForce * particle.drift;
-
-        if (isMobileView) {
-          particle.vx += Math.cos(time * 0.42 + particle.y * 0.01) * 0.0008 * particle.drift;
-          particle.vy += Math.sin(time * 0.38 + particle.x * 0.01) * 0.0007 * particle.drift - 0.0002 * particle.drift;
-        }
+        particle.vx += (-centerDy / centerDistance) * 0.003 * particle.drift;
+        particle.vy += (centerDx / centerDistance) * 0.003 * particle.drift;
 
         for (const pulse of pulses) {
           const pulseDx = particle.x - pulse.x;
@@ -272,38 +262,51 @@ export default function AnimatedBackground() {
   useEffect(() => {
     if (!mounted || reduce) return;
 
-    function onMobilePointerDown(event: PointerEvent) {
+    function isMobileTapEvent(event: PointerEvent) {
       const isMobileTap = event.pointerType !== "mouse" || globalThis.matchMedia("(pointer: coarse)").matches;
-      if (!isMobileTap || !event.isPrimary) return;
+      return isMobileTap && event.isPrimary;
+    }
 
-      const target = event.target;
-      if (
+    function isInteractiveTarget(target: EventTarget | null) {
+      return (
         target instanceof Element &&
-        target.closest("a, button, input, textarea, select, summary, [role='button']")
-      ) {
-        lastMobileTapRef.current = null;
+        Boolean(target.closest("a, button, input, textarea, select, summary, [role='button']"))
+      );
+    }
+
+    function onMobilePointerDown(event: PointerEvent) {
+      if (!isMobileTapEvent(event) || isInteractiveTarget(event.target)) {
+        touchStartRef.current = null;
         return;
       }
 
-      const now = performance.now();
-      const lastTap = lastMobileTapRef.current;
-      lastMobileTapRef.current = {
+      touchStartRef.current = {
+        id: event.pointerId,
         x: event.clientX,
         y: event.clientY,
-        time: now,
+        time: performance.now(),
       };
+    }
 
-      if (!lastTap) return;
+    function onMobilePointerUp(event: PointerEvent) {
+      if (!isMobileTapEvent(event)) return;
 
-      const elapsed = now - lastTap.time;
-      const distance = Math.hypot(event.clientX - lastTap.x, event.clientY - lastTap.y);
-      if (elapsed > 380 || distance > 44) return;
+      const start = touchStartRef.current;
+      touchStartRef.current = null;
+      if (!start || start.id !== event.pointerId) return;
 
-      lastMobileTapRef.current = null;
+      const elapsed = performance.now() - start.time;
+      const distance = Math.hypot(event.clientX - start.x, event.clientY - start.y);
+      if (elapsed > 360 || distance > 14) return;
+
+      const now = performance.now();
+      if (now - lastSparkAtRef.current < 260) return;
+      lastSparkAtRef.current = now;
+
       const id = sparkIdRef.current;
       sparkIdRef.current += 1;
 
-      setTapSparks([
+      setTapSparks(() => [
         {
           id,
           x: event.clientX,
@@ -312,10 +315,18 @@ export default function AnimatedBackground() {
       ]);
     }
 
+    function onMobilePointerCancel() {
+      touchStartRef.current = null;
+    }
+
     globalThis.addEventListener("pointerdown", onMobilePointerDown, { passive: true });
+    globalThis.addEventListener("pointerup", onMobilePointerUp, { passive: true });
+    globalThis.addEventListener("pointercancel", onMobilePointerCancel, { passive: true });
 
     return () => {
       globalThis.removeEventListener("pointerdown", onMobilePointerDown);
+      globalThis.removeEventListener("pointerup", onMobilePointerUp);
+      globalThis.removeEventListener("pointercancel", onMobilePointerCancel);
     };
   }, [mounted, reduce]);
 
@@ -333,10 +344,10 @@ export default function AnimatedBackground() {
             key={spark.id}
             className="mobile-star-spark"
             style={{ left: spark.x, top: spark.y }}
-            initial={{ opacity: 0.42, scale: 0.26 }}
-            animate={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0.44, scale: 0.24 }}
+            animate={{ opacity: 0, scale: 0.86 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
             onAnimationComplete={() => {
               setTapSparks((current) => current.filter((item) => item.id !== spark.id));
             }}
@@ -346,9 +357,9 @@ export default function AnimatedBackground() {
               <motion.span
                 key={`${spark.id}-${offset.x}-${offset.y}`}
                 className="mobile-star-spark-dot"
-                initial={{ opacity: 0.48, x: 0, y: 0, scale: 0.55 }}
-                animate={{ opacity: 0, x: offset.x, y: offset.y, scale: 0.74 }}
-                transition={{ duration: 0.2, delay: offset.delay, ease: "easeOut" }}
+                initial={{ opacity: 0.46, x: 0, y: 0, scale: 0.52 }}
+                animate={{ opacity: 0, x: offset.x, y: offset.y, scale: 0.7 }}
+                transition={{ duration: 0.18, delay: offset.delay, ease: "easeOut" }}
               />
             ))}
           </motion.div>

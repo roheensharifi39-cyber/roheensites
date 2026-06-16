@@ -97,10 +97,10 @@ body {
   pointer-events: none;
   position: absolute;
   z-index: 3;
-  width: 28px;
-  height: 28px;
-  margin-left: -14px;
-  margin-top: -14px;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  margin-top: -13px;
   border-radius: 999px;
   mix-blend-mode: screen;
 }
@@ -117,13 +117,13 @@ body {
 .mobile-star-spark-ring {
   width: 100%;
   height: 100%;
-  border: 1px solid rgb(186 230 253 / 0.34);
+  border: 1px solid rgb(186 230 253 / 0.32);
   background:
-    radial-gradient(circle, rgb(125 211 252 / 0.12), transparent 56%),
-    radial-gradient(circle, rgb(168 85 247 / 0.06), transparent 72%);
+    radial-gradient(circle, rgb(125 211 252 / 0.11), transparent 58%),
+    radial-gradient(circle, rgb(168 85 247 / 0.05), transparent 72%);
   box-shadow:
-    0 0 6px rgb(125 211 252 / 0.18),
-    inset 0 0 7px rgb(186 230 253 / 0.08);
+    0 0 5px rgb(125 211 252 / 0.16),
+    inset 0 0 6px rgb(186 230 253 / 0.07);
 }
 
 .mobile-star-spark-dot {
@@ -131,8 +131,8 @@ body {
   height: 2px;
   background: rgb(248 250 252 / 0.72);
   box-shadow:
-    0 0 4px rgb(125 211 252 / 0.32),
-    0 0 6px rgb(168 85 247 / 0.14);
+    0 0 4px rgb(125 211 252 / 0.3),
+    0 0 5px rgb(168 85 247 / 0.12);
 }
 
 .galaxy-nebula {
@@ -272,7 +272,7 @@ body {
   }
 
   .galaxy-play-canvas {
-    opacity: 0.68;
+    opacity: 0.64;
   }
 
   .galaxy-nebula {
