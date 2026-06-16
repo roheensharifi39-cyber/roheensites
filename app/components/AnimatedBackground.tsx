@@ -1,18 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-
-type TapSpark = {
-  id: number;
-  x: number;
-  y: number;
-};
-
-const mobileSparkOffsets = [
-  { x: 9, y: -10, delay: 0.03 },
-  { x: -11, y: 8, delay: 0.07 },
-] as const;
 
 function useMounted() {
   const [mounted, setMounted] = useState(false);
@@ -27,11 +16,8 @@ function useMounted() {
 
 export default function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const sparkIdRef = useRef(0);
-  const lastSparkAtRef = useRef(0);
   const reduce = useReducedMotion();
   const mounted = useMounted();
-  const [tapSparks, setTapSparks] = useState<TapSpark[]>([]);
 
   useEffect(() => {
     if (!mounted || reduce) return;
@@ -66,6 +52,7 @@ export default function AnimatedBackground() {
     let width = 0;
     let height = 0;
     let pixelRatio = 1;
+    let isMobileView = false;
     const particles: Particle[] = [];
     const pulses: Pulse[] = [];
     const pointer = {
@@ -76,23 +63,25 @@ export default function AnimatedBackground() {
 
     function createParticle(): Particle {
       const warm = Math.random() > 0.54;
+      const speed = isMobileView ? 0.42 : 0.28;
       return {
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.28,
-        vy: (Math.random() - 0.5) * 0.28,
-        size: 0.65 + Math.random() * 2.9,
-        alpha: 0.28 + Math.random() * 0.72,
+        vx: (Math.random() - 0.5) * speed,
+        vy: (Math.random() - 0.5) * speed,
+        size: isMobileView ? 0.58 + Math.random() * 2.35 : 0.65 + Math.random() * 2.9,
+        alpha: isMobileView ? 0.32 + Math.random() * 0.58 : 0.28 + Math.random() * 0.72,
         hue: warm ? 28 + Math.random() * 26 : 190 + Math.random() * 66,
-        drift: 0.25 + Math.random() * 0.85,
+        drift: isMobileView ? 0.5 + Math.random() * 1.05 : 0.25 + Math.random() * 0.85,
       };
     }
 
     function seedParticles() {
       particles.length = 0;
-      const minimumCount = width < 640 ? 70 : 120;
-      const maximumCount = width < 640 ? 140 : 260;
-      const count = Math.min(maximumCount, Math.max(minimumCount, Math.floor((width * height) / 8200)));
+      const minimumCount = isMobileView ? 88 : 120;
+      const maximumCount = isMobileView ? 156 : 260;
+      const density = isMobileView ? 6800 : 8200;
+      const count = Math.min(maximumCount, Math.max(minimumCount, Math.floor((width * height) / density)));
       for (let index = 0; index < count; index += 1) {
         particles.push(createParticle());
       }
@@ -102,6 +91,7 @@ export default function AnimatedBackground() {
       width = globalThis.innerWidth;
       height = globalThis.innerHeight;
       pixelRatio = Math.min(globalThis.devicePixelRatio || 1, 2);
+      isMobileView = width < 640 || globalThis.matchMedia("(pointer: coarse)").matches;
       canvas.width = Math.floor(width * pixelRatio);
       canvas.height = Math.floor(height * pixelRatio);
       canvas.style.width = `${width}px`;
@@ -111,34 +101,34 @@ export default function AnimatedBackground() {
     }
 
     function onPointerMove(event: PointerEvent) {
+      if (event.pointerType !== "mouse" || isMobileView) return;
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       pointer.active = true;
     }
 
     function onPointerDown(event: PointerEvent) {
-      const isTouch = event.pointerType !== "mouse";
-      const burstCount = isTouch ? 6 : 18;
-      const burstSpeed = isTouch ? 0.46 : 1;
+      if (event.pointerType !== "mouse" || isMobileView) return;
 
       pulses.push({
         x: event.clientX,
         y: event.clientY,
         age: 0,
-        strength: isTouch ? 0.28 : 1,
+        strength: 1,
       });
 
+      const burstCount = 18;
       for (let index = 0; index < burstCount; index += 1) {
         const angle = (Math.PI * 2 * index) / burstCount;
         particles.push({
           x: event.clientX + Math.cos(angle) * 6,
           y: event.clientY + Math.sin(angle) * 6,
-          vx: Math.cos(angle) * (0.8 + Math.random() * 1.2) * burstSpeed,
-          vy: Math.sin(angle) * (0.8 + Math.random() * 1.2) * burstSpeed,
-          size: isTouch ? 0.85 + Math.random() * 1.2 : 1.1 + Math.random() * 2.2,
-          alpha: isTouch ? 0.42 : 0.72,
+          vx: Math.cos(angle) * (0.8 + Math.random() * 1.2),
+          vy: Math.sin(angle) * (0.8 + Math.random() * 1.2),
+          size: 1.1 + Math.random() * 2.2,
+          alpha: 0.72,
           hue: index % 3 === 0 ? 198 : index % 3 === 1 ? 38 : 286,
-          drift: isTouch ? 0.72 : 1.2,
+          drift: 1.2,
         });
       }
     }
@@ -174,11 +164,17 @@ export default function AnimatedBackground() {
         const centerDx = centerPullX - particle.x;
         const centerDy = centerPullY - particle.y;
         const centerDistance = Math.max(Math.hypot(centerDx, centerDy), 1);
+        const orbitForce = isMobileView ? 0.0047 : 0.003;
 
         particle.vx += dx * pointerForce * particle.drift * 0.0012;
         particle.vy += dy * pointerForce * particle.drift * 0.0012;
-        particle.vx += (-centerDy / centerDistance) * 0.003 * particle.drift;
-        particle.vy += (centerDx / centerDistance) * 0.003 * particle.drift;
+        particle.vx += (-centerDy / centerDistance) * orbitForce * particle.drift;
+        particle.vy += (centerDx / centerDistance) * orbitForce * particle.drift;
+
+        if (isMobileView) {
+          particle.vx += Math.cos(time * 0.52 + particle.y * 0.014) * 0.0019 * particle.drift;
+          particle.vy += Math.sin(time * 0.44 + particle.x * 0.012) * 0.0017 * particle.drift - 0.0007 * particle.drift;
+        }
 
         for (const pulse of pulses) {
           const pulseDx = particle.x - pulse.x;
@@ -258,36 +254,6 @@ export default function AnimatedBackground() {
     };
   }, [mounted, reduce]);
 
-  useEffect(() => {
-    if (!mounted || reduce) return;
-
-    function onMobilePointerDown(event: PointerEvent) {
-      const isMobileTap = event.pointerType !== "mouse" || globalThis.matchMedia("(max-width: 640px)").matches;
-      if (!isMobileTap) return;
-
-      const now = performance.now();
-      if (now - lastSparkAtRef.current < 180) return;
-      lastSparkAtRef.current = now;
-
-      const id = sparkIdRef.current;
-      sparkIdRef.current += 1;
-
-      setTapSparks(() => [
-        {
-          id,
-          x: event.clientX,
-          y: event.clientY,
-        },
-      ]);
-    }
-
-    globalThis.addEventListener("pointerdown", onMobilePointerDown, { passive: true });
-
-    return () => {
-      globalThis.removeEventListener("pointerdown", onMobilePointerDown);
-    };
-  }, [mounted, reduce]);
-
   return (
     <div className="pointer-events-none fixed inset-0 z-[1] overflow-hidden" aria-hidden="true">
       <div className="galaxy-generated-background" />
@@ -296,33 +262,6 @@ export default function AnimatedBackground() {
       <div className="galaxy-orbit galaxy-orbit-one" />
       <div className="galaxy-orbit galaxy-orbit-two" />
       <canvas ref={canvasRef} className="galaxy-play-canvas" />
-      <AnimatePresence>
-        {tapSparks.map((spark) => (
-          <motion.div
-            key={spark.id}
-            className="mobile-star-spark"
-            style={{ left: spark.x, top: spark.y }}
-            initial={{ opacity: 0.58, scale: 0.22 }}
-            animate={{ opacity: 0, scale: 1.12 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
-            onAnimationComplete={() => {
-              setTapSparks((current) => current.filter((item) => item.id !== spark.id));
-            }}
-          >
-            <span className="mobile-star-spark-ring" />
-            {mobileSparkOffsets.map((offset) => (
-              <motion.span
-                key={`${spark.id}-${offset.x}-${offset.y}`}
-                className="mobile-star-spark-dot"
-                initial={{ opacity: 0.62, x: 0, y: 0, scale: 0.6 }}
-                animate={{ opacity: 0, x: offset.x, y: offset.y, scale: 0.84 }}
-                transition={{ duration: 0.24, delay: offset.delay, ease: "easeOut" }}
-              />
-            ))}
-          </motion.div>
-        ))}
-      </AnimatePresence>
     </div>
   );
 }
