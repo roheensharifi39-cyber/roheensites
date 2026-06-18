@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "Privacy policy for Sites by Roheen student portfolio website services.",
 };
 
-const lastUpdated = "June 17, 2026";
+const lastUpdated = "June 18, 2026";
 
 export default function PrivacyPolicyPage() {
   return (
@@ -48,11 +48,39 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
+            <h2 className="text-xl font-semibold text-white">Payment Providers</h2>
+            <p className="mt-3">
+              Payments may be handled by third-party providers such as Stripe, Venmo, or Zelle.
+              Sites by Roheen does not collect or store full card numbers, bank account numbers, or
+              payment login credentials through this website.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-white">Retention and Deletion</h2>
+            <p className="mt-3">
+              Project information may be kept while services are active and for a reasonable period
+              afterward for records, support, and dispute prevention. You can request deletion of
+              project materials, subject to records that must be kept for legitimate business,
+              security, payment, or legal reasons.
+            </p>
+          </section>
+
+          <section>
             <h2 className="text-xl font-semibold text-white">Security</h2>
             <p className="mt-3">
               Reasonable steps are used to protect project information, but no internet service,
               email exchange, or payment system can be guaranteed to be completely secure. Do not
               send passwords, private keys, or highly sensitive documents unless specifically agreed.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-white">Children and Students</h2>
+            <p className="mt-3">
+              Services are intended for students who can lawfully request a website and provide
+              project materials. If you are under 13, do not send personal information without a
+              parent or guardian.
             </p>
           </section>
 

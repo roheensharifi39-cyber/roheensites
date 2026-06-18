@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "Terms of use for Sites by Roheen student portfolio website services.",
 };
 
-const lastUpdated = "June 17, 2026";
+const lastUpdated = "June 18, 2026";
 
 export default function TermsOfUsePage() {
   return (
@@ -48,6 +48,17 @@ export default function TermsOfUsePage() {
           </section>
 
           <section>
+            <h2 className="text-xl font-semibold text-white">Client Responsibilities</h2>
+            <p className="mt-3">
+              You are responsible for reviewing your site before launch, checking names, dates,
+              links, claims, contact details, and payment information, and requesting corrections
+              promptly. Do not send passwords, private keys, Social Security numbers, medical
+              records, financial account numbers, or other highly sensitive information unless a
+              separate written arrangement is made.
+            </p>
+          </section>
+
+          <section>
             <h2 className="text-xl font-semibold text-white">Cancellations and Updates</h2>
             <p className="mt-3">
               Monthly clients may cancel future service. After cancellation, maintenance and future
@@ -62,6 +73,35 @@ export default function TermsOfUsePage() {
               A portfolio website can help present your work professionally, but Sites by Roheen
               does not guarantee internships, jobs, scholarships, interviews, admissions, or other
               outcomes.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-white">Third-Party Services</h2>
+            <p className="mt-3">
+              Websites may rely on third-party services such as hosting providers, domain
+              registrars, payment processors, email providers, analytics tools, or client-provided
+              platforms. Sites by Roheen is not responsible for outages, policy changes, fees,
+              account issues, or security incidents caused by third-party services.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-white">Limitation of Liability</h2>
+            <p className="mt-3">
+              To the maximum extent allowed by law, Sites by Roheen is not liable for indirect,
+              incidental, special, consequential, or punitive damages, including lost opportunities,
+              lost data, lost profits, or reputational harm. The maximum total liability for a
+              project is limited to the amount you paid for that project in the three months before
+              the claim.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-white">No Professional Advice</h2>
+            <p className="mt-3">
+              Sites by Roheen provides website design and related support only. Content suggestions
+              are not legal, financial, academic, medical, employment, or professional advice.
             </p>
           </section>
 
