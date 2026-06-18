@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://sitesbyroheen.vercel.app"),
   title: "Sites by Roheen | Student Portfolio Websites",
   description:
-    "Affordable portfolio websites for students starting at $10/month or $40 one-time.",
+    "Affordable portfolio websites for students starting at $5/month or $40 one-time.",
   keywords: [
     "Sites by Roheen",
     "student portfolio website",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Sites by Roheen | Student Portfolio Websites",
     description:
-      "Affordable student portfolio websites starting at $10/month or $40 one-time.",
+      "Affordable student portfolio websites starting at $5/month or $40 one-time.",
     images: ["/icon.png"],
   },
 };

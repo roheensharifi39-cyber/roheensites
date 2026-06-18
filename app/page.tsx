@@ -15,11 +15,13 @@ const navItems = [
   ["Contact", "#contact"],
 ];
 
-const proofStrip = ["$10/month with updates", "$40 one-time", "Built and deployed live"];
+const proofStrip = ["$5/month with updates", "$40 one-time", "Built and deployed live"];
 
 const contactEmail = "roheensharifi39@gmail.com";
 const contactPhone = "703-593-4536";
 const contactPhoneHref = "tel:+17035934536";
+const startSiteSubject = encodeURIComponent("Start my portfolio site");
+const questionSubject = encodeURIComponent("Portfolio website question");
 
 const benefits = [
   {
@@ -90,7 +92,7 @@ const caseStudies = [
 const plans = [
   {
     name: "Monthly",
-    price: "$10/month",
+    price: "$5/month",
     badge: "Recommended",
     summary: "For students who want updates as projects, resumes, and links change.",
     cta: "Start Monthly",
@@ -119,7 +121,7 @@ const plans = [
       "Live website link",
       "No future changes included",
     ],
-    note: "Future edits are $10 per update, or you can upgrade to the $10/month plan.",
+    note: "Future edits are $5 per update, or you can upgrade to the $5/month plan.",
   },
 ];
 
@@ -130,7 +132,7 @@ const processSteps = [
   },
   {
     title: "Choose your plan",
-    copy: "$10/month with updates, or $40 one-time with no future changes included.",
+    copy: "$5/month with updates, or $40 one-time with no future changes included.",
   },
   {
     title: "I build the first version",
@@ -146,8 +148,9 @@ const payments = [
   {
     brand: "stripe",
     title: "Stripe subscription/card",
-    copy: "Preferred for the $10/month plan.",
-    value: "STRIPE_MONTHLY_LINK_HERE",
+    copy: "Preferred for the $5/month plan.",
+    value: "Pay $5/month securely on Stripe",
+    href: "https://buy.stripe.com/fZucN6feZ2iucVOe74d7q02",
   },
   {
     brand: "venmo",
@@ -159,7 +162,7 @@ const payments = [
     brand: "zelle",
     title: "Zelle",
     copy: "Good for one-time sites or first payments.",
-    value: "ZELLE_EMAIL_HERE",
+    value: "7039196589",
   },
 ] as const;
 
@@ -172,14 +175,14 @@ const trustBullets = [
 
 const faqs = [
   {
-    question: "What do I get for $10/month?",
+    question: "What do I get for $5/month?",
     answer:
       "You get a clean portfolio website with core sections, a live link, basic maintenance, and up to 2 small updates per month while subscribed.",
   },
   {
     question: "What do I get for $40 one-time?",
     answer:
-      "The $40 one-time plan includes initial setup only. Future edits are $10 per update, or you can upgrade to the monthly plan.",
+      "The $40 one-time plan includes initial setup only. Future edits are $5 per update, or you can upgrade to the monthly plan.",
   },
   {
     question: "Can I cancel the monthly plan?",
@@ -214,7 +217,7 @@ const faqs = [
   {
     question: "Can I upgrade from one-time to monthly?",
     answer:
-      "Yes. If you start one-time and need future edits, you can upgrade to the $10/month plan.",
+      "Yes. If you start one-time and need future edits, you can upgrade to the $5/month plan.",
   },
 ];
 
@@ -798,7 +801,7 @@ function HeroMockup() {
           : undefined
       }
       whileHover={motionReady ? { y: -14, scale: 1.012 } : undefined}
-      className="relative mx-auto w-full max-w-[23rem] sm:max-w-none"
+      className="relative mx-auto w-full max-w-[23rem] min-w-0 sm:max-w-none"
     >
       <motion.div
         aria-hidden="true"
@@ -1018,13 +1021,13 @@ export default function Home() {
 
       <section className="relative z-10 px-4 pb-8 pt-3 sm:px-6 sm:pt-5 lg:px-8 lg:pb-10 lg:pt-7">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-7 lg:min-h-[400px] lg:grid-cols-[0.94fr_1.06fr]">
-          <div className="max-w-5xl">
+          <div className="min-w-0 max-w-5xl">
             <Reveal instant>
               <p className="mb-4 max-w-xl text-sm font-semibold text-sky-200">
                 Student portfolio websites that look polished before the interview starts.
               </p>
               <h1 className="text-balance text-[clamp(2.58rem,11vw,4.2rem)] font-semibold leading-[0.92] tracking-[-0.05em] text-zinc-50 sm:leading-[0.9] sm:tracking-[-0.07em] lg:text-[clamp(3.9rem,4.6vw,5.1rem)]">
-                Look internship-ready for $10/month.
+                Look internship-ready for $5/month.
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300 sm:text-lg">
                 I build clean, interactive portfolio websites for students who need their resume,
@@ -1039,7 +1042,7 @@ export default function Home() {
             </Reveal>
           </div>
 
-          <Reveal mobileOnly delay={0.08}>
+          <Reveal mobileOnly delay={0.08} className="min-w-0">
             <HeroMockup />
           </Reveal>
         </div>
@@ -1253,7 +1256,7 @@ export default function Home() {
         <SectionIntro
           eyebrow="Payments"
           title="Pay the way that fits the plan."
-          copy="Monthly clients use the $10/month subscription. One-time sites are $40 with no future changes included."
+          copy="Monthly clients use the $5/month subscription. One-time sites are $40 with no future changes included."
         />
         <div className="grid gap-4 lg:grid-cols-3">
           {payments.map((payment, index) => (
@@ -1268,9 +1271,20 @@ export default function Home() {
                   <PaymentSymbol brand={payment.brand} />
                   <h3 className="mt-7 text-xl font-semibold text-zinc-50">{payment.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-zinc-300">{payment.copy}</p>
-                  <code className="mt-6 block break-all rounded-2xl border border-white/10 bg-[#070a11] p-4 text-sm text-sky-100">
-                    {payment.value}
-                  </code>
+                  {"href" in payment ? (
+                    <a
+                      href={payment.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-6 flex min-h-12 items-center justify-center rounded-2xl border border-sky-200/20 bg-sky-300 px-4 text-center text-sm font-bold text-[#061018] transition hover:bg-sky-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                    >
+                      {payment.value}
+                    </a>
+                  ) : (
+                    <code className="mt-6 block break-all rounded-2xl border border-white/10 bg-[#070a11] p-4 text-sm text-sky-100">
+                      {payment.value}
+                    </code>
+                  )}
                 </motion.article>
               </MagneticSurface>
             </Reveal>
@@ -1369,10 +1383,10 @@ export default function Home() {
                   website you can share anywhere.
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <CTA href={`mailto:${contactEmail}?subject=Start%20my%20portfolio%20site`}>
+                  <CTA href={`mailto:${contactEmail}?subject=${startSiteSubject}`}>
                     Start My Site
                   </CTA>
-                  <CTA href={`mailto:${contactEmail}?subject=Portfolio%20website%20question`} variant="secondary">
+                  <CTA href={`mailto:${contactEmail}?subject=${questionSubject}`} variant="secondary">
                     Ask a Question
                   </CTA>
                 </div>
@@ -1414,6 +1428,12 @@ export default function Home() {
             </a>
             <a href={`mailto:${contactEmail}`} className="transition hover:text-zinc-100">
               Contact
+            </a>
+            <a href="/privacy" className="transition hover:text-zinc-100">
+              Privacy
+            </a>
+            <a href="/terms" className="transition hover:text-zinc-100">
+              Terms
             </a>
           </div>
         </div>
