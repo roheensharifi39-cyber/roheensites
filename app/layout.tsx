@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -14,14 +14,20 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sitesbyroheen.vercel.app"),
-  title: "Sites by Roheen | Student Portfolio Websites",
+  title: "Sites by Roheen | Affordable Websites for Students and Businesses",
   description:
-    "Affordable portfolio websites for students starting at $5/month or $40 one-time.",
+    "Clean, affordable websites for students, local businesses, creators, and brands. Student sites start as low as $5/month.",
   keywords: [
     "Sites by Roheen",
+    "affordable website builder",
+    "local business website",
+    "small business website",
     "student portfolio website",
     "portfolio website for students",
     "student web design",
+    "restaurant menu website",
+    "personal brand website",
+    "landing page website",
     "internship portfolio",
     "college portfolio website",
     "resume website",
@@ -33,9 +39,9 @@ export const metadata: Metadata = {
     apple: "/apple-icon.png",
   },
   openGraph: {
-    title: "Sites by Roheen | Student Portfolio Websites",
+    title: "Sites by Roheen | Affordable Websites for Students and Businesses",
     description:
-      "Clean, mobile-friendly portfolio websites for students applying to internships, research, jobs, and scholarships.",
+      "Clean, mobile-friendly websites for student portfolios, local businesses, personal brands, service pages, and menus.",
     url: "https://sitesbyroheen.vercel.app",
     siteName: "Sites by Roheen",
     type: "website",
@@ -50,11 +56,18 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sites by Roheen | Student Portfolio Websites",
+    title: "Sites by Roheen | Affordable Websites for Students and Businesses",
     description:
-      "Affordable student portfolio websites starting at $5/month or $40 one-time.",
+      "Student websites starting as low as $5/month. Business website pricing is affordable and negotiable.",
     images: ["/icon.png"],
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  colorScheme: "dark",
+  themeColor: "#070a11",
 };
 
 export default function RootLayout({

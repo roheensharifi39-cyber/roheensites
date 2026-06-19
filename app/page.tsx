@@ -8,6 +8,7 @@ import AnimatedBackground from "./components/AnimatedBackground";
 const navItems = [
   ["Work", "#work"],
   ["Pricing", "#pricing"],
+  ["Services", "#services"],
   ["Process", "#process"],
   ["Payments", "#payments"],
   ["About", "#about"],
@@ -15,124 +16,139 @@ const navItems = [
   ["Contact", "#contact"],
 ];
 
-const proofStrip = ["$5/month with updates", "$40 one-time", "Built and deployed live"];
+const proofStrip = [
+  "Student websites starting as low as $5/month",
+  "Business pricing is flexible",
+  "Clean websites without agency-level pricing",
+];
 
 const contactEmail = "roheensharifi39@gmail.com";
 const contactPhone = "703-593-4536";
 const contactPhoneHref = "tel:+17035934536";
-const startSiteSubject = encodeURIComponent("Start my portfolio site");
-const questionSubject = encodeURIComponent("Portfolio website question");
+const startSiteSubject = encodeURIComponent("Start a website with Sites by Roheen");
+const questionSubject = encodeURIComponent("Website question for Sites by Roheen");
 
 const benefits = [
   {
-    title: "Recruiter-ready story",
-    copy: "Your resume, projects, links, and contact info become one clean path instead of scattered tabs.",
+    title: "Student portfolio websites",
+    copy: "Resume, projects, skills, GitHub, LinkedIn, and contact links shaped into one professional page.",
     tone: "cyan",
     span: "md:col-span-4",
   },
   {
-    title: "Built for quick scanning",
-    copy: "Strong hierarchy, sharp sections, and mobile polish help busy people understand you faster.",
+    title: "Local business websites",
+    copy: "Simple service pages that explain what you do, where you work, and how customers can reach you.",
     tone: "slate",
     span: "md:col-span-4",
   },
   {
-    title: "Looks better than a PDF alone",
-    copy: "A live site gives your application one more signal of care, taste, and preparation.",
+    title: "Restaurant and menu websites",
+    copy: "Mobile-friendly menus, hours, location details, and contact buttons for people checking fast.",
     tone: "lime",
     span: "md:col-span-4",
   },
   {
-    title: "Easy to keep fresh",
-    copy: "Monthly clients can update projects, resume details, links, and copy as their experience grows.",
+    title: "Landing pages",
+    copy: "Google-ready pages for offers, services, events, products, and one-link campaigns.",
     tone: "amber",
-    span: "md:col-span-7",
+    span: "md:col-span-4",
   },
   {
-    title: "One link everywhere",
-    copy: "Add it to LinkedIn, resumes, emails, internship forms, QR codes, and personal outreach.",
+    title: "Personal brand websites",
+    copy: "Clean pages for creators, professionals, and brands that need a polished place online.",
     tone: "violet",
-    span: "md:col-span-5",
+    span: "md:col-span-4",
+  },
+  {
+    title: "Website updates and redesigns",
+    copy: "Refresh old copy, improve layout, update sections, or make an existing site easier to use.",
+    tone: "cyan",
+    span: "md:col-span-4",
+  },
+  {
+    title: "Domain and deployment setup",
+    copy: "Help connecting a custom domain, publishing the site, and getting the basics ready to share.",
+    tone: "slate",
+    span: "md:col-span-12",
   },
 ];
 
 const caseStudies = [
   {
     id: "dmv",
-    title: "DMVOFFGRID",
-    type: "Client website",
+    title: "DMVOFFGRID community website",
+    type: "Local community website",
     href: "https://dmvoffgrid.com",
     description:
-      "A website I made for DMVOFFGRID with a custom domain, mobile design, founder page, event sections, clothing drop area, deployment, and AI assistant.",
-    tags: ["Client website", "Custom domain", "Mobile-ready", "AI assistant"],
+      "A live community website with a custom domain, mobile design, founder page, event sections, clothing drop area, deployment, and AI assistant.",
+    tags: ["Community site", "Custom domain", "Mobile-friendly", "AI assistant"],
     span: "lg:col-span-7",
   },
   {
     id: "student",
-    title: "John Adams Portfolio Example",
-    type: "Portfolio example",
+    title: "Student Portfolio Website",
+    type: "Student website",
     href: "https://student-portfolio-website-tau.vercel.app/",
     description:
-      "A polished student portfolio example with About, Projects, Resume, GitHub, and contact links in one professional website.",
-    tags: ["Example", "Resume", "Projects", "Interactive UI"],
+      "A polished portfolio example with About, Projects, Resume, GitHub, LinkedIn, and contact links in one professional website.",
+    tags: ["Student portfolio", "Resume", "Projects", "Contact links"],
     span: "lg:col-span-5",
   },
   {
     id: "biomed",
     title: "Biomedical Engineering Portfolio",
-    type: "Portfolio example",
+    type: "Research portfolio",
     href: "https://v0-biomedical-engineering-portfolio-ten.vercel.app/",
     description:
       "A research-forward biomedical engineering portfolio example for biosignals, embedded systems, ML projects, resume links, and contact.",
-    tags: ["Example", "Biomedical engineering", "Projects"],
+    tags: ["Biomedical engineering", "Research", "Projects"],
     span: "lg:col-span-12",
   },
 ] as const;
 
 const plans = [
   {
-    name: "Monthly",
-    price: "$5/month",
-    badge: "Recommended",
-    summary: "For students who want updates as projects, resumes, and links change.",
-    cta: "Start Monthly",
+    name: "Student Portfolio Sites",
+    price: "Starting at $5/month",
+    badge: "Lowest starting price",
+    summary: "Perfect for resumes, internships, research, projects, GitHub, LinkedIn, and contact links.",
+    cta: "Start Student Site",
     featured: true,
     includes: [
-      "Personal portfolio website",
-      "About, resume, projects, skills, contact",
+      "Resume-to-website layout",
+      "Projects and skills section",
+      "GitHub/LinkedIn/contact links",
       "Mobile-friendly design",
-      "Live website link",
-      "Small updates while subscribed",
-      "Up to 2 small updates per month",
-      "Basic maintenance included",
-      "Upgrade-ready as you grow",
+      "Updates available",
+      "Flexible pricing",
     ],
   },
   {
-    name: "One-Time",
-    price: "$40",
-    summary: "For students who want a simple site now and no monthly payment.",
-    cta: "Get One-Time Site",
+    name: "Business Websites",
+    price: "Affordable & negotiable",
+    badge: "Flexible scope",
+    summary: "Simple, professional websites for local businesses, services, restaurants, creators, and brands.",
+    cta: "Start Business Site",
     featured: false,
     includes: [
-      "One-time portfolio website setup",
-      "Basic student portfolio layout",
-      "Mobile-friendly design",
-      "Live website link",
-      "No future changes included",
+      "One-page business website",
+      "Services, menu, or product sections",
+      "Contact buttons and inquiry flow",
+      "Mobile-friendly layout",
+      "Google-ready structure",
+      "Pricing based on project size",
     ],
-    note: "Future edits are $5 per update, or you can upgrade to the $5/month plan.",
   },
 ];
 
 const processSteps = [
   {
     title: "Send your info",
-    copy: "Resume, projects, LinkedIn, GitHub, photos, research, and anything you want included.",
+    copy: "Send your resume, project links, business details, menu, services, photos, brand notes, or anything you want included.",
   },
   {
-    title: "Choose your plan",
-    copy: "$5/month with updates, or $40 one-time with no future changes included.",
+    title: "Pick the right scope",
+    copy: "Student sites can start as low as $5/month. Business website pricing is affordable and negotiable based on what you need.",
   },
   {
     title: "I build the first version",
@@ -148,20 +164,20 @@ const payments = [
   {
     brand: "stripe",
     title: "Stripe subscription/card",
-    copy: "Preferred for the $5/month plan.",
+    copy: "Preferred for student sites starting as low as $5/month.",
     value: "Pay $5/month securely on Stripe",
     href: "https://buy.stripe.com/fZucN6feZ2iucVOe74d7q02",
   },
   {
     brand: "venmo",
     title: "Venmo",
-    copy: "Good for one-time sites or first payments.",
+    copy: "Good for agreed project deposits, one-time work, or first payments.",
     value: "@Roheen-Sharifi",
   },
   {
     brand: "zelle",
     title: "Zelle",
-    copy: "Good for one-time sites or first payments.",
+    copy: "Good for agreed project deposits, one-time work, or first payments.",
     value: "7039196589",
   },
 ] as const;
@@ -169,55 +185,55 @@ const payments = [
 const trustBullets = [
   "Biomedical Engineering student at Virginia Tech",
   "Made and deployed real websites",
-  "Student-focused pricing",
-  "Mobile-first portfolio design",
+  "Student and business pricing stays flexible",
+  "Mobile-friendly, professional, and easy to share",
 ];
 
 const faqs = [
   {
-    question: "What do I get for $5/month?",
+    question: "What can I get for $5/month?",
     answer:
-      "You get a clean portfolio website with core sections, a live link, basic maintenance, and up to 2 small updates per month while subscribed.",
+      "Student websites start as low as $5/month. The exact setup depends on what you need, but the goal is a clean, shareable portfolio with the essentials.",
   },
   {
-    question: "What do I get for $40 one-time?",
+    question: "How much does a business website cost?",
     answer:
-      "The $40 one-time plan includes initial setup only. Future edits are $5 per update, or you can upgrade to the monthly plan.",
-  },
-  {
-    question: "Can I cancel the monthly plan?",
-    answer:
-      "Yes. You can cancel anytime. After cancellation, future updates and maintenance stop. Site access and hosting terms depend on the setup used for your project.",
+      "Business website pricing is affordable and negotiable. I price it based on the number of sections, content, setup needs, and whether you want ongoing updates.",
   },
   {
     question: "Can I request updates?",
     answer:
-      "Yes. Monthly clients can request small resume, project, link, photo, or copy updates while subscribed.",
+      "Yes. Updates can be included in a monthly student plan or priced separately for business projects depending on the size of the changes.",
   },
   {
-    question: "How many updates are included?",
+    question: "Can you make a one-page business site?",
     answer:
-      "The monthly plan includes up to 2 small updates per month. Major redesigns, extra pages, or large new sections may cost extra.",
+      "Yes. I can build one-page websites for local services, restaurants, creators, personal brands, and businesses that need a first web presence.",
   },
   {
-    question: "Do I need a domain?",
+    question: "Do I need a custom domain?",
     answer:
       "No. You can start with a simple live website link. If you want a custom domain, I can help connect one after you buy it.",
   },
   {
-    question: "Can you use my resume?",
+    question: "Can you use my resume or business info?",
     answer:
-      "Yes. Your resume is usually the best starting point. You can also send LinkedIn, GitHub, project links, research, photos, and contact info.",
+      "Yes. Resumes, LinkedIn, GitHub, menus, service lists, photos, logos, and existing pages can all help shape the site.",
   },
   {
     question: "How long does it take?",
     answer:
-      "Most simple student portfolio sites move quickly once your resume, projects, links, and plan choice are ready.",
+      "Most simple websites move quickly once the content, links, and project scope are ready.",
   },
   {
-    question: "Can I upgrade from one-time to monthly?",
+    question: "Is this an agency?",
     answer:
-      "Yes. If you start one-time and need future edits, you can upgrade to the $5/month plan.",
+      "No. Sites by Roheen is a personal, direct website-building service. You work with Roheen, and pricing stays practical.",
+  },
+  {
+    question: "Can I start small and add more later?",
+    answer:
+      "Yes. You can start with a focused site and add sections, updates, a domain, or redesign work later.",
   },
 ];
 
@@ -623,7 +639,7 @@ function DMVOFFGRIDPreview() {
         </div>
         <div className="relative overflow-hidden p-4 sm:p-7">
           <div className="mb-4 inline-flex rounded-full border border-orange-200/24 bg-orange-300/12 px-3 py-1 text-xs font-semibold text-orange-100 sm:absolute sm:right-6 sm:top-6 sm:mb-0">
-            Mobile-ready
+            Mobile-friendly
           </div>
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-orange-200">Outdoor community</p>
           <h3 className="mt-4 max-w-sm text-[2.45rem] font-semibold leading-[0.92] tracking-[-0.045em] text-zinc-50 sm:mt-10 sm:text-[3.45rem]">
@@ -661,7 +677,7 @@ function StudentPreview({ compact = false }: { compact?: boolean }) {
       <div className="rounded-[20px] border border-white/12 bg-[#0d1622]">
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
           <BrowserDots />
-          <p className="text-[11px] font-semibold text-zinc-400">johnadams.dev</p>
+          <p className="text-[11px] font-semibold text-zinc-400">student-site.dev</p>
         </div>
         <div className="p-3 sm:p-5">
           <div className="flex flex-wrap gap-2">
@@ -819,8 +835,8 @@ function HeroMockup() {
         animate={motionReady ? labelFloatAnimation : undefined}
         transition={motionReady ? { duration: 6, repeat: Infinity, ease: "easeInOut" } : undefined}
       >
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-sky-200">Live portfolio</p>
-        <p className="mt-1 text-sm font-semibold text-zinc-50">Resume + projects + links</p>
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-sky-200">Live website preview</p>
+        <p className="mt-1 text-sm font-semibold text-zinc-50">Portfolios, businesses, brands</p>
       </motion.div>
     </motion.div>
   );
@@ -836,7 +852,7 @@ function MobileNav() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative z-[60] grid h-10 w-10 place-items-center rounded-full border border-white/12 bg-white/[0.06] text-zinc-50 outline-none transition hover:bg-white/[0.1] focus-visible:ring-2 focus-visible:ring-sky-200 lg:hidden"
+        className="absolute right-2 top-1/2 z-[60] grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-white/12 bg-white/[0.06] text-zinc-50 outline-none transition hover:bg-white/[0.1] focus-visible:ring-2 focus-visible:ring-sky-200 sm:right-3 lg:hidden"
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
         aria-controls={menuId}
@@ -907,7 +923,7 @@ function MobileNav() {
                 ))}
                 <div className="mt-2 border-t border-white/10 px-1 pt-3">
                   <CTA href="#contact" onClick={() => setOpen(false)}>
-                    Start My Site
+                    Start a Website
                   </CTA>
                 </div>
               </motion.div>
@@ -985,8 +1001,8 @@ export default function Home() {
       <div className="site-grain" />
 
       <header className="sticky top-0 z-40 px-3 py-3 sm:px-5">
-        <nav className="nav-glass relative mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-3 rounded-full border border-white/10 bg-[#0b1019]/78 px-3 shadow-[0_18px_70px_rgba(0,0,0,0.28)] sm:h-16 sm:px-5">
-          <a href="#" className="flex min-w-0 items-center gap-3 font-semibold tracking-tight text-zinc-50">
+        <nav className="nav-glass relative mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-3 rounded-full border border-white/10 bg-[#0b1019]/78 px-3 pr-14 shadow-[0_18px_70px_rgba(0,0,0,0.28)] sm:h-16 sm:px-5 sm:pr-16 lg:pr-5">
+          <a href="#" className="flex min-w-0 items-center gap-2 font-semibold tracking-tight text-zinc-50 sm:gap-3">
             <span className="relative grid h-9 w-9 shrink-0 overflow-hidden rounded-full border border-sky-200/24 bg-[#050914] shadow-[0_0_22px_rgba(125,211,252,0.16)]">
               <Image
                 src="/images/icon.png"
@@ -994,10 +1010,10 @@ export default function Home() {
                 fill
                 sizes="36px"
                 className="object-cover"
-                priority
+                preload
               />
             </span>
-            <span className="truncate">Sites by Roheen</span>
+            <span className="max-w-[10rem] truncate text-sm sm:max-w-none sm:text-base">Sites by Roheen</span>
           </a>
 
           <div className="hidden items-center gap-5 lg:flex">
@@ -1013,7 +1029,7 @@ export default function Home() {
           </div>
 
           <div className="hidden lg:block">
-            <CTA href="#contact">Start My Site</CTA>
+            <CTA href="#contact">Start a Website</CTA>
           </div>
           <MobileNav />
         </nav>
@@ -1023,20 +1039,20 @@ export default function Home() {
         <div className="mx-auto grid w-full max-w-7xl items-center gap-7 lg:min-h-[400px] lg:grid-cols-[0.94fr_1.06fr]">
           <div className="min-w-0 max-w-5xl">
             <Reveal instant>
-              <p className="mb-4 max-w-xl text-sm font-semibold text-sky-200">
-                Student portfolio websites that look polished before the interview starts.
+              <p className="mb-4 max-w-[22rem] text-sm font-semibold leading-6 text-sky-200 sm:max-w-xl">
+                Built for students, local businesses, creators, and brands.
               </p>
-              <h1 className="text-balance text-[clamp(2.58rem,11vw,4.2rem)] font-semibold leading-[0.92] tracking-[-0.05em] text-zinc-50 sm:leading-[0.9] sm:tracking-[-0.07em] lg:text-[clamp(3.9rem,4.6vw,5.1rem)]">
-                Look internship-ready for $5/month.
+              <h1 className="max-w-[11ch] text-balance text-[clamp(2.18rem,10vw,4.2rem)] font-semibold leading-[0.98] tracking-[-0.04em] text-zinc-50 sm:max-w-none sm:leading-[0.9] sm:tracking-[-0.07em] lg:text-[clamp(3.9rem,4.6vw,5.1rem)]">
+                Affordable websites for students and local businesses.
               </h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300 sm:text-lg">
-                I build clean, interactive portfolio websites for students who need their resume,
-                projects, skills, GitHub, LinkedIn, and contact links in one professional place.
+              <p className="mt-5 max-w-[23rem] text-base leading-7 text-zinc-300 sm:max-w-2xl sm:text-lg">
+                I build clean, mobile-friendly websites for student portfolios, local businesses,
+                personal brands, and service pages with flexible pricing that fits what you actually need.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <CTA href="#contact">Start My Site</CTA>
+                <CTA href="#contact">Start a Website</CTA>
                 <CTA href="#work" variant="secondary">
-                  See Live Work
+                  View Examples
                 </CTA>
               </div>
             </Reveal>
@@ -1075,9 +1091,9 @@ export default function Home() {
       <SectionShell id="work" className="pt-4 lg:pt-6">
         <SectionIntro
           instant
-          eyebrow="Examples & Client Work"
-          title="A few examples of my work."
-          copy="Explore live websites and portfolio examples that show the kind of clean, mobile-ready site I can make for you."
+          eyebrow="Examples"
+          title="Examples for portfolios and businesses."
+          copy="Explore live websites and portfolio examples that show the kind of clean, mobile-friendly site I can make for you."
         />
 
         <div className="grid grid-flow-dense gap-5 lg:grid-cols-12">
@@ -1122,10 +1138,11 @@ export default function Home() {
         </div>
       </SectionShell>
 
-      <SectionShell>
+      <SectionShell id="services">
         <SectionIntro
-          title="A portfolio should feel like a signal, not homework."
-          copy="The goal is simple: make your work easier to understand, easier to trust, and easier to share."
+          eyebrow="Services"
+          title="Simple websites for real needs."
+          copy="Student portfolios, service pages, business sites, menus, landing pages, updates, domains, and deployment help."
         />
 
         <div className="grid grid-flow-dense gap-4 md:grid-cols-12">
@@ -1151,8 +1168,8 @@ export default function Home() {
       <SectionShell id="pricing" className="lg:py-20">
         <SectionIntro
           eyebrow="Pricing"
-          title="Two simple ways to get online."
-          copy="Monthly is best if you want updates as your resume changes. One-time is best if you only need the first site."
+          title="Flexible pricing without agency-level costs."
+          copy="Student sites start as low as $5/month. Business website pricing is affordable and negotiable."
           center
         />
 
@@ -1199,12 +1216,6 @@ export default function Home() {
                       ))}
                     </div>
 
-                    {plan.note ? (
-                      <p className="mt-6 rounded-2xl border border-sky-200/20 bg-sky-300/[0.07] p-4 text-sm leading-6 text-sky-50">
-                        {plan.note}
-                      </p>
-                    ) : null}
-
                     <div className="mt-auto pt-8">
                       <CTA href="#contact" variant={plan.featured ? "primary" : "secondary"}>
                         {plan.cta}
@@ -1216,6 +1227,12 @@ export default function Home() {
             </Reveal>
           ))}
         </div>
+        <Reveal>
+          <p className="mx-auto mt-6 max-w-3xl text-center text-sm leading-6 text-zinc-400">
+            Every project is different. Pricing is flexible and based on what you need, how many
+            sections you want, and whether you need ongoing updates.
+          </p>
+        </Reveal>
       </SectionShell>
 
       <SectionShell id="process">
@@ -1256,7 +1273,7 @@ export default function Home() {
         <SectionIntro
           eyebrow="Payments"
           title="Pay the way that fits the plan."
-          copy="Monthly clients use the $5/month subscription. One-time sites are $40 with no future changes included."
+          copy="Use the Stripe subscription for student monthly sites. Venmo and Zelle are available after we agree on project scope."
         />
         <div className="grid gap-4 lg:grid-cols-3">
           {payments.map((payment, index) => (
@@ -1336,22 +1353,22 @@ export default function Home() {
           </Reveal>
           <Reveal delay={0.1}>
             <h2 className="text-balance text-3xl font-semibold leading-[1.02] tracking-[-0.035em] text-zinc-50 sm:text-6xl sm:tracking-[-0.04em]">
-              Built by a student who understands the signal.
+              Personal website help without the agency process.
             </h2>
             <div className="mt-6 grid gap-4 text-base leading-7 text-zinc-300">
               <p>
                 I&apos;m Roheen Sharifi, a biomedical engineering student at Virginia Tech who builds
-                clean, modern websites for students, communities, and personal brands.
+                clean, modern websites for students, local businesses, creators, and brands.
               </p>
               <p>
-                I started building websites because many students have strong resumes, projects,
-                research experience, and goals, but no professional place to show it all.
+                I started with student portfolios, then expanded Sites by Roheen for people and local
+                businesses who need a professional web presence without overpaying.
               </p>
               <p>
                 I recently made the website for DMVOFFGRID, a live outdoor community with a custom
                 domain, mobile design, founder page, event sections, clothing drop area, and AI
-                assistant. Now I&apos;m using the same process to help students look more professional
-                online at a price they can actually afford.
+                assistant. Now I use that same direct process for student portfolios, business sites,
+                service pages, menus, and landing pages.
               </p>
             </div>
           </Reveal>
@@ -1359,7 +1376,7 @@ export default function Home() {
       </SectionShell>
 
       <SectionShell id="faq">
-        <SectionIntro eyebrow="FAQ" title="Questions students usually ask." center />
+        <SectionIntro eyebrow="FAQ" title="Questions people usually ask." center />
         <Reveal className="mx-auto grid max-w-4xl gap-3">
           {faqs.map((faq, index) => (
             <Reveal key={faq.question} mobileOnly delay={index * 0.035}>
@@ -1379,12 +1396,12 @@ export default function Home() {
                   Ready to look more professional online?
                 </h2>
                 <p className="mt-5 text-base leading-7 text-zinc-300 sm:text-lg sm:leading-8">
-                  Send your resume, projects, and links. I&apos;ll turn them into a clean portfolio
-                  website you can share anywhere.
+                  Send your resume, projects, business details, menu, services, or links. I&apos;ll
+                  turn them into a clean website you can share anywhere.
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <CTA href={`mailto:${contactEmail}?subject=${startSiteSubject}`}>
-                    Start My Site
+                    Start a Website
                   </CTA>
                   <CTA href={`mailto:${contactEmail}?subject=${questionSubject}`} variant="secondary">
                     Ask a Question
