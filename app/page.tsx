@@ -163,10 +163,17 @@ const processSteps = [
 const payments = [
   {
     brand: "stripe",
-    title: "Stripe subscription/card",
+    title: "Stripe student subscription",
     copy: "Preferred for student sites starting as low as $5/month.",
     value: "Pay $5/month securely on Stripe",
     href: "https://buy.stripe.com/fZucN6feZ2iucVOe74d7q02",
+  },
+  {
+    brand: "stripe",
+    title: "Stripe business payment",
+    copy: "Use this after we agree on the scope for a business website or local service site.",
+    value: "Pay for a business website on Stripe",
+    href: "https://buy.stripe.com/4gM9AU9UFcX85tm3sqd7q03",
   },
   {
     brand: "venmo",
@@ -1273,9 +1280,9 @@ export default function Home() {
         <SectionIntro
           eyebrow="Payments"
           title="Pay the way that fits the plan."
-          copy="Use the Stripe subscription for student monthly sites. Venmo and Zelle are available after we agree on project scope."
+          copy="Use the student Stripe link for monthly portfolio sites, or the business Stripe link after we agree on project scope."
         />
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {payments.map((payment, index) => (
             <Reveal key={payment.title} delay={index * 0.06}>
               <MagneticSurface className="h-full" intensity={12}>
