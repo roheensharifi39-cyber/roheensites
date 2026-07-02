@@ -82,6 +82,7 @@ const caseStudies = [
     description:
       "A live community website with a custom domain, mobile design, founder page, event sections, clothing drop area, deployment, and AI assistant.",
     tags: ["Community site", "Custom domain", "Mobile-friendly", "AI assistant"],
+    cta: "View dmvoffgrid.com",
     span: "lg:col-span-7",
   },
   {
@@ -92,6 +93,18 @@ const caseStudies = [
     description:
       "A polished portfolio example with About, Projects, Resume, GitHub, LinkedIn, and contact links in one professional website.",
     tags: ["Student portfolio", "Resume", "Projects", "Contact links"],
+    cta: "View example",
+    span: "lg:col-span-5",
+  },
+  {
+    id: "finance",
+    title: "Finance and Accounting Student Portfolio",
+    type: "Student portfolio",
+    href: "https://mannank.com",
+    description:
+      "A dark gray and blue finance portfolio example for accounting experience, analytics projects, resume details, and professional contact links.",
+    tags: ["Finance", "Accounting", "Resume", "Analytics"],
+    cta: "View mannank.com",
     span: "lg:col-span-5",
   },
   {
@@ -102,7 +115,8 @@ const caseStudies = [
     description:
       "A research-forward biomedical engineering portfolio example for biosignals, embedded systems, ML projects, resume links, and contact.",
     tags: ["Biomedical engineering", "Research", "Projects"],
-    span: "lg:col-span-12",
+    cta: "View example",
+    span: "lg:col-span-7",
   },
 ] as const;
 
@@ -799,9 +813,91 @@ function BiomedicalPreview() {
   );
 }
 
+function FinancePreview() {
+  const motionReady = useMotionReady();
+  const rows = [
+    ["Audit prep", "$14.2k", "72%"],
+    ["Forecast", "$8.7k", "58%"],
+    ["Tax notes", "$3.1k", "66%"],
+  ];
+
+  return (
+    <div className="relative min-h-[260px] overflow-hidden rounded-[22px] border border-white/10 bg-[#080d14] p-3 sm:min-h-[280px] sm:rounded-[24px] sm:p-4">
+      <motion.div
+        aria-hidden="true"
+        className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-blue-500/18 blur-3xl"
+        animate={motionReady ? { opacity: [0.28, 0.68, 0.28], scale: [0.95, 1.08, 0.95] } : undefined}
+        transition={motionReady ? { duration: 5.8, repeat: Infinity, ease: "easeInOut" } : undefined}
+      />
+      <div className="relative flex h-full flex-col rounded-[20px] border border-white/10 bg-[#0d1520] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] sm:p-5">
+        <div className="flex items-start gap-4">
+          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-[22px] border border-blue-200/24 bg-blue-300/[0.09] text-[3.1rem] font-semibold leading-none text-blue-100 shadow-[0_22px_70px_rgba(37,99,235,0.18)] sm:h-20 sm:w-20 sm:text-[3.8rem]">
+            <span className="-mt-1">$</span>
+          </div>
+          <div className="min-w-0 pt-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-200">Finance/accounting</p>
+            <h3 className="mt-3 text-[1.85rem] font-semibold leading-[0.96] tracking-[-0.04em] text-zinc-50 sm:text-[2.25rem]">
+              Ledger-ready portfolio
+            </h3>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {["Resume", "CPA track", "Contact"].map((item) => (
+                <span key={item} className="rounded-full border border-blue-200/16 bg-blue-300/[0.08] px-3 py-1.5 text-[11px] font-bold text-blue-100">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5 rounded-[18px] border border-white/10 bg-[#111923] p-3 sm:mt-6 sm:p-4">
+          <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
+            <p className="truncate text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">mannank.com</p>
+            <span className="shrink-0 rounded-full bg-blue-300 px-3 py-1 text-[11px] font-bold text-[#061018]">
+              Live
+            </span>
+          </div>
+          <div className="mt-4 grid gap-2.5">
+            {rows.map(([label, value, width], index) => (
+              <motion.div
+                key={label}
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.045] px-3 py-2.5"
+                animate={motionReady ? { x: [0, 2, 0] } : undefined}
+                transition={motionReady ? { duration: 3.8 + index * 0.35, repeat: Infinity, ease: "easeInOut" } : undefined}
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-zinc-100">{label}</p>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+                    <motion.span
+                      className="block h-full rounded-full bg-blue-300/80"
+                      style={{ width }}
+                      initial={false}
+                      animate={motionReady ? { scaleX: [0.92, 1, 0.92] } : undefined}
+                      transition={motionReady ? { duration: 3.2, repeat: Infinity, ease: "easeInOut" } : undefined}
+                    />
+                  </div>
+                </div>
+                <p className="font-mono text-sm font-semibold text-blue-100">{value}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+          {["Valuation", "Tax", "Excel"].map((item) => (
+            <div key={item} className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2 text-[11px] font-semibold text-zinc-300">
+              {item}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CasePreview({ id }: { id: CaseId }) {
   if (id === "dmv") return <DMVOFFGRIDPreview />;
   if (id === "student") return <StudentPreview />;
+  if (id === "finance") return <FinancePreview />;
   return <BiomedicalPreview />;
 }
 
@@ -1126,7 +1222,7 @@ export default function Home() {
                           <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-300">{card.description}</p>
                         </div>
                         <span className="inline-flex min-h-11 w-full shrink-0 items-center justify-center rounded-full border border-white/12 bg-white/[0.055] px-4 text-sm font-semibold text-zinc-50 opacity-80 transition duration-300 group-hover:border-sky-200/40 group-hover:bg-sky-300 group-hover:text-[#061018] group-hover:opacity-100 sm:w-auto">
-                          {card.id === "dmv" ? "View dmvoffgrid.com" : "View example"}
+                          {card.cta}
                         </span>
                       </div>
                       <div className="mt-5 flex flex-wrap gap-2">

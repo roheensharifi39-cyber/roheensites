@@ -93,6 +93,22 @@ body {
   mix-blend-mode: screen;
 }
 
+.mobile-static-stars {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.mobile-static-stars::before,
+.mobile-static-stars::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 .mobile-star-spark {
   pointer-events: none;
   position: absolute;
@@ -272,13 +288,54 @@ body {
   }
 
   .galaxy-play-canvas {
-    opacity: 0.64;
+    display: none;
+  }
+
+  .mobile-static-stars {
+    display: block;
+    opacity: 0.95;
+    background:
+      radial-gradient(circle at 7% 17%, rgb(245 252 255 / 0.92) 0 1px, transparent 2.8px),
+      radial-gradient(circle at 18% 8%, rgb(125 211 252 / 0.72) 0 1.4px, transparent 3.4px),
+      radial-gradient(circle at 32% 22%, rgb(255 246 220 / 0.72) 0 1px, transparent 2.8px),
+      radial-gradient(circle at 58% 11%, rgb(224 242 254 / 0.82) 0 1.2px, transparent 3px),
+      radial-gradient(circle at 83% 19%, rgb(186 230 253 / 0.7) 0 1px, transparent 2.8px),
+      radial-gradient(circle at 94% 31%, rgb(248 250 252 / 0.76) 0 1.3px, transparent 3px),
+      radial-gradient(circle at 12% 43%, rgb(186 230 253 / 0.66) 0 1px, transparent 2.7px),
+      radial-gradient(circle at 27% 57%, rgb(255 239 198 / 0.56) 0 1.2px, transparent 3px),
+      radial-gradient(circle at 52% 46%, rgb(125 211 252 / 0.68) 0 1px, transparent 2.8px),
+      radial-gradient(circle at 73% 53%, rgb(248 250 252 / 0.78) 0 1.5px, transparent 3.4px),
+      radial-gradient(circle at 88% 69%, rgb(186 230 253 / 0.6) 0 1px, transparent 2.8px),
+      radial-gradient(circle at 15% 76%, rgb(248 250 252 / 0.72) 0 1.4px, transparent 3.4px),
+      radial-gradient(circle at 39% 86%, rgb(125 211 252 / 0.54) 0 1px, transparent 2.7px),
+      radial-gradient(circle at 63% 78%, rgb(255 245 220 / 0.58) 0 1.2px, transparent 3px),
+      radial-gradient(circle at 92% 90%, rgb(224 242 254 / 0.62) 0 1px, transparent 2.8px);
+  }
+
+  .mobile-static-stars::before {
+    opacity: 0.72;
+    background:
+      radial-gradient(circle at 20% 18%, rgb(125 211 252 / 0.34), transparent 0.52rem),
+      radial-gradient(circle at 51% 12%, rgb(248 250 252 / 0.28), transparent 0.46rem),
+      radial-gradient(circle at 76% 42%, rgb(186 230 253 / 0.34), transparent 0.58rem),
+      radial-gradient(circle at 33% 67%, rgb(255 242 209 / 0.24), transparent 0.46rem),
+      radial-gradient(circle at 69% 82%, rgb(125 211 252 / 0.24), transparent 0.54rem);
+    filter: blur(0.4px);
+  }
+
+  .mobile-static-stars::after {
+    opacity: 0.5;
+    background:
+      radial-gradient(circle at 50% 18%, rgb(125 211 252 / 0.16), transparent 11rem),
+      radial-gradient(circle at 16% 58%, rgb(255 239 204 / 0.1), transparent 9rem),
+      radial-gradient(circle at 88% 74%, rgb(186 230 253 / 0.11), transparent 10rem);
   }
 
   .galaxy-nebula {
     inset: -30%;
     filter: blur(30px) saturate(110%);
-    opacity: 0.36;
+    opacity: 0.34;
+    animation: none;
   }
 
   .galaxy-cursor-glow {
@@ -296,6 +353,10 @@ body {
   .galaxy-orbit-two {
     width: 118vw;
     opacity: 0.42;
+  }
+
+  .mobile-star-spark {
+    display: none;
   }
 }
 

@@ -25,6 +25,22 @@ function useMounted() {
   return mounted;
 }
 
+function useStaticMobileBackground() {
+  const [isStaticMobile, setIsStaticMobile] = useState(false);
+
+  useEffect(() => {
+    const media = globalThis.matchMedia("(max-width: 640px), (pointer: coarse)");
+    const sync = () => setIsStaticMobile(media.matches);
+
+    sync();
+    media.addEventListener("change", sync);
+
+    return () => media.removeEventListener("change", sync);
+  }, []);
+
+  return isStaticMobile;
+}
+
 export default function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sparkIdRef = useRef(0);
@@ -32,10 +48,11 @@ export default function AnimatedBackground() {
   const touchStartRef = useRef<{ id: number; x: number; y: number; time: number } | null>(null);
   const reduce = useReducedMotion();
   const mounted = useMounted();
+  const isStaticMobile = useStaticMobileBackground();
   const [tapSparks, setTapSparks] = useState<TapSpark[]>([]);
 
   useEffect(() => {
-    if (!mounted || reduce) return;
+    if (!mounted || reduce || isStaticMobile) return;
 
     const canvasElement = canvasRef.current;
     if (!canvasElement) return;
@@ -296,10 +313,10 @@ export default function AnimatedBackground() {
       globalThis.removeEventListener("pointerup", onPointerUp);
       globalThis.removeEventListener("pointercancel", onPointerCancel);
     };
-  }, [mounted, reduce]);
+  }, [mounted, reduce, isStaticMobile]);
 
   useEffect(() => {
-    if (!mounted || reduce) return;
+    if (!mounted || reduce || isStaticMobile) return;
 
     function isMobileTapEvent(event: PointerEvent) {
       const isMobileTap = event.pointerType !== "mouse" || globalThis.matchMedia("(pointer: coarse)").matches;
@@ -360,11 +377,12 @@ export default function AnimatedBackground() {
       globalThis.removeEventListener("pointerup", onMobilePointerUp);
       globalThis.removeEventListener("pointercancel", onMobilePointerCancel);
     };
-  }, [mounted, reduce]);
+  }, [mounted, reduce, isStaticMobile]);
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[1] overflow-hidden" aria-hidden="true">
       <div className="galaxy-generated-background" />
+      <div className="mobile-static-stars" />
       <div className="galaxy-nebula" />
       <div className="galaxy-cursor-glow" />
       <div className="galaxy-orbit galaxy-orbit-one" />
