@@ -118,6 +118,17 @@ const caseStudies = [
     cta: "View example",
     span: "lg:col-span-7",
   },
+  {
+    id: "basedandfit",
+    title: "Based & Fit DMV Food Ratings",
+    type: "Searchable ratings website",
+    href: "https://basedandfit.icu",
+    description:
+      "A black, white, and red searchable DMV restaurant rating database with TikTok sources, leaderboards, filters, and ranked results.",
+    tags: ["Ratings database", "DMV", "TikTok sources", "Custom domain"],
+    cta: "View basedandfit.icu",
+    span: "lg:col-span-12",
+  },
 ] as const;
 
 const plans = [
@@ -894,10 +905,136 @@ function FinancePreview() {
   );
 }
 
+function BasedFitPreview() {
+  const motionReady = useMotionReady();
+  const resultRows = [
+    ["#1", "Halal Eatz", "Chantilly burger board", "9.5", "border-yellow-300/70 bg-yellow-300/[0.14] text-yellow-100 shadow-[0_0_34px_rgba(250,204,21,0.18),inset_0_1px_0_rgba(255,255,255,0.08)]"],
+    ["#2", "Charred", "Herndon burger board", "8.2", "border-amber-400/45 bg-amber-400/[0.08] text-amber-200"],
+    ["#3", "Big Bunz", "Ashburn burger board", "8.5", "border-amber-400/45 bg-amber-400/[0.08] text-amber-200"],
+  ];
+
+  return (
+    <div className="relative min-h-[360px] overflow-hidden rounded-[22px] border border-white/10 bg-[#030303] p-3 sm:min-h-[390px] sm:rounded-[24px] sm:p-4">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_8%,rgba(235,55,47,0.22),transparent_28%),radial-gradient(circle_at_82%_12%,rgba(255,255,255,0.075),transparent_22%),linear-gradient(180deg,#050505_0%,#020202_100%)]" />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 opacity-[0.09] [background-image:linear-gradient(rgba(255,255,255,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.35)_1px,transparent_1px)] [background-size:32px_32px]"
+      />
+      <div className="relative grid h-full gap-4 lg:grid-cols-[0.78fr_1.22fr]">
+        <div className="flex min-h-[300px] flex-col justify-between rounded-[20px] border border-white/10 bg-black/62 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+          <Image
+            src="/images/based-fit-logo-cropped-transparent.png"
+            alt="Based & Fit"
+            width={983}
+            height={157}
+            className="h-auto w-full max-w-[19rem] object-contain"
+          />
+          <div>
+            <div className="mb-5 flex flex-wrap gap-2">
+              {["Searchable ratings", "TikTok sources"].map((item) => (
+                <span key={item} className="rounded-full border border-red-400/45 bg-red-500/[0.08] px-3 py-1.5 text-[11px] font-black text-red-300">
+                  {item}
+                </span>
+              ))}
+            </div>
+            <h3 className="max-w-[8.5ch] text-[3.25rem] font-black leading-[0.86] tracking-[-0.065em] text-white sm:text-[4.4rem]">
+              DMV food ratings.
+            </h3>
+            <p className="mt-4 max-w-sm text-sm font-medium leading-6 text-zinc-300">
+              Search rankings, reviews, and restaurant ratings across the DMV in seconds.
+            </p>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              ["80", "Restaurants"],
+              ["10", "Boards"],
+              ["20", "Locations"],
+            ].map(([value, label]) => (
+              <div key={label} className="rounded-2xl border border-white/8 bg-white/[0.045] p-3">
+                <p className="text-xl font-black text-white">{value}</p>
+                <p className="mt-1 text-[11px] font-bold text-zinc-400">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-[20px] border border-white/12 bg-[#0a0b0f]/92 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.48),inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="rounded-full border border-red-400/45 bg-red-500/[0.08] px-3 py-1.5 text-xs font-black text-red-300">
+              Live database preview
+            </span>
+            <span className="rounded-full border border-white/12 bg-black px-3 py-1.5 text-xs font-black text-zinc-300">
+              Original TikTok review
+            </span>
+          </div>
+          <h3 className="mt-5 max-w-xl text-3xl font-black leading-[0.96] tracking-[-0.045em] text-white sm:text-[2.6rem]">
+            Search the review archive before you spend money.
+          </h3>
+          <div className="mt-5 rounded-2xl border border-white/14 bg-black px-4 py-4">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xl font-black text-red-400">Q</span>
+              <span className="min-w-0 flex-1 font-mono text-lg font-black text-white">burger</span>
+              <span className="hidden rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-black text-zinc-300 sm:inline-flex">
+                80 indexed restaurants
+              </span>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-3 border-b border-white/10 pb-4 text-xs font-bold text-zinc-400 sm:grid-cols-[auto_1fr]">
+            <span>Queries</span>
+            <div className="flex flex-wrap gap-2">
+              {["burger", "kunafa", "rice", "Chantilly"].map((item) => (
+                <span key={item} className="rounded-full border border-white/12 px-3 py-1 text-zinc-300">
+                  {item}
+                </span>
+              ))}
+            </div>
+            <span>Filters</span>
+            <div className="flex flex-wrap gap-2">
+              {["Burger board", "Herndon", "8+"].map((item) => (
+                <span key={item} className="rounded-full border border-red-400/45 bg-red-500/[0.08] px-3 py-1 text-red-300">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <p className="font-mono text-xs font-black text-white">3 ranked results</p>
+            <span className="rounded-full border border-white/12 bg-white/[0.055] px-3 py-1.5 text-xs font-black text-zinc-300">
+              Highest rated
+            </span>
+          </div>
+          <div className="mt-3 grid gap-2.5">
+            {resultRows.map(([rank, name, board, score, tone], index) => (
+              <motion.div
+                key={name}
+                className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border p-3 ${tone}`}
+                animate={motionReady ? { x: [0, index === 0 ? 3 : 1, 0] } : undefined}
+                transition={motionReady ? { duration: 3.8 + index * 0.35, repeat: Infinity, ease: "easeInOut" } : undefined}
+              >
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-yellow-400 text-xs font-black text-black">
+                  {rank}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-base font-black text-white">{name}</p>
+                  <p className="truncate text-xs font-bold text-zinc-400">{board}</p>
+                </div>
+                <span className="rounded-xl border border-current px-3 py-2 font-mono text-sm font-black">
+                  {score}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CasePreview({ id }: { id: CaseId }) {
   if (id === "dmv") return <DMVOFFGRIDPreview />;
   if (id === "student") return <StudentPreview />;
   if (id === "finance") return <FinancePreview />;
+  if (id === "basedandfit") return <BasedFitPreview />;
   return <BiomedicalPreview />;
 }
 

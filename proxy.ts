@@ -5,6 +5,10 @@ const MAX_REQUESTS = 120;
 const MAX_BUCKETS = 5_000;
 const buckets = new Map<string, { count: number; resetAt: number }>();
 const allowedMethods = new Set(["GET", "HEAD", "OPTIONS"]);
+const customDomainRoutes = new Map([
+  ["basedandfit.icu", "/basedandfit"],
+  ["www.basedandfit.icu", "/basedandfit"],
+]);
 
 function cleanHeaderValue(value: string | null) {
   return value?.replace(/[\r\n]/g, "").trim();
@@ -52,6 +56,12 @@ function securityHeaders(response: NextResponse) {
   response.headers.set("X-DNS-Prefetch-Control", "off");
   response.headers.set("X-Permitted-Cross-Domain-Policies", "none");
   return response;
+}
+
+function routeForHost(request: NextRequest) {
+  const host = cleanHeaderValue(request.headers.get("host"))?.split(":")[0]?.toLowerCase();
+  if (!host) return null;
+  return customDomainRoutes.get(host) || null;
 }
 
 function pruneBuckets(now: number) {
@@ -115,7 +125,12 @@ export function proxy(request: NextRequest) {
     );
   }
 
-  const response = NextResponse.next();
+  const customRoute = routeForHost(request);
+  const shouldRewriteToCustomRoute = customRoute && request.nextUrl.pathname === "/";
+  const response = shouldRewriteToCustomRoute
+    ? NextResponse.rewrite(new URL(customRoute, request.url))
+    : NextResponse.next();
+
   response.headers.set("RateLimit-Limit", String(MAX_REQUESTS));
   response.headers.set("RateLimit-Remaining", String(Math.max(0, MAX_REQUESTS - bucket.count)));
   response.headers.set("RateLimit-Reset", String(Math.ceil(bucket.resetAt / 1000)));
