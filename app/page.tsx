@@ -16,12 +16,6 @@ const navItems = [
   ["Contact", "#contact"],
 ];
 
-const proofStrip = [
-  "Student websites starting as low as $5/month",
-  "Business pricing is flexible",
-  "Clean websites without agency-level pricing",
-];
-
 const contactEmail = "roheensharifi39@gmail.com";
 const contactPhone = "703-593-4536";
 const contactPhoneHref = "tel:+17035934536";
@@ -1279,20 +1273,21 @@ export default function Home() {
         <div className="mx-auto grid w-full max-w-7xl items-center gap-7 lg:min-h-[400px] lg:grid-cols-[0.94fr_1.06fr]">
           <div className="min-w-0 max-w-5xl">
             <Reveal instant>
-              <p className="mb-4 max-w-[22rem] text-sm font-semibold leading-6 text-sky-200 sm:max-w-xl">
-                Built for students, local businesses, creators, and brands.
-              </p>
+              <div className="mb-4">
+                <p className="inline-flex w-fit items-center rounded-full border border-sky-200/35 bg-sky-200/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-sky-100">
+                  Limited-Time Launch Pricing
+                </p>
+              </div>
               <h1 className="max-w-[11ch] text-balance text-[clamp(2.18rem,10vw,4.2rem)] font-semibold leading-[0.98] tracking-[-0.04em] text-zinc-50 sm:max-w-none sm:leading-[0.9] sm:tracking-[-0.07em] lg:text-[clamp(3.9rem,4.6vw,5.1rem)]">
-                Affordable websites for students and local businesses.
+                Your Professional Website, Without the Professional Price.
               </h1>
               <p className="mt-5 max-w-[23rem] text-base leading-7 text-zinc-300 sm:max-w-2xl sm:text-lg">
-                I build clean, mobile-friendly websites for student portfolios, local businesses,
-                personal brands, and service pages with flexible pricing that fits what you actually need.
+                Modern, mobile-friendly websites for students, creators, and growing businesses—starting at only $5 per month for a limited time.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <CTA href="#contact">Start a Website</CTA>
-                <CTA href="#work" variant="secondary">
-                  View Examples
+                <CTA href="#contact">Get My Website</CTA>
+                <CTA href="#pricing" variant="secondary">
+                  View Plans
                 </CTA>
               </div>
             </Reveal>
@@ -1311,15 +1306,29 @@ export default function Home() {
               animate={motionReady ? { scaleX: [0.06, 1, 0.06], opacity: [0.35, 0.9, 0.35] } : undefined}
               transition={motionReady ? { duration: 5, repeat: Infinity, ease: "easeInOut" } : undefined}
             />
-            <div className="grid gap-3 sm:grid-cols-3">
-              {proofStrip.map((item, index) => (
-                <Reveal key={item} mobileOnly delay={index * 0.05}>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                { name: "Ozza Bejjaji", review: "🔥🔥🔥", image: "/images/roheen-portrait.png", alt: "Ozza Bejjaji" },
+                { name: "BasedAndFit", review: "This looks really nice!", image: "/images/based-and-fit-review.jpeg", alt: "Based & Fit logo" },
+              ].map((item, index) => (
+                <Reveal key={item.name} mobileOnly delay={index * 0.05}>
                   <motion.div
                     whileTap={mobileMotionReady ? { scale: 0.985, y: -1 } : undefined}
                     transition={{ type: "spring", stiffness: 320, damping: 22 }}
-                    className="rounded-[20px] bg-[#0d1420]/76 px-4 py-3 text-sm font-semibold text-zinc-100"
+                    className="rounded-[20px] bg-[#0d1420]/76 px-4 py-3"
                   >
-                    {item}
+                    <p className="text-sm tracking-[0.18em] text-amber-200" aria-label="5 out of 5 stars">★★★★★</p>
+                    <p className="mt-2 text-sm font-medium text-zinc-100">“{item.review}”</p>
+                    <div className="mt-2 flex items-center gap-2 text-xs font-semibold text-sky-200">
+                      <Image
+                        src={item.image}
+                        alt={item.alt}
+                        width={24}
+                        height={24}
+                        className="h-6 w-6 rounded-full border border-sky-200/30 object-cover"
+                      />
+                      <span>{item.name}</span>
+                    </div>
                   </motion.div>
                 </Reveal>
               ))}
