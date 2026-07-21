@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { MotionConfig, motion } from "motion/react";
+import { useState } from "react";
 import AnimatedBackground from "./components/AnimatedBackground";
 
 const navItems = [
@@ -269,130 +269,15 @@ function cx(...classes: Array<string | false | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
-function useMounted() {
-  const [mounted, setMounted] = useState(false);
+const sectionRevealInitial = { opacity: 0, y: 14 };
+const sectionRevealVisible = { opacity: 1, y: 0 };
+const sectionRevealViewport = { once: true, amount: 0.2 };
+const sectionRevealTransition = {
+  duration: 0.42,
+  ease: [0.22, 1, 0.36, 1] as const,
+};
 
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  return mounted;
-}
-
-function useMotionReady() {
-  const mounted = useMounted();
-  const reduce = useReducedMotion();
-
-  return mounted && !reduce;
-}
-
-function useMobileViewport() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const media = globalThis.matchMedia("(max-width: 640px)");
-    const sync = () => setIsMobile(media.matches);
-
-    sync();
-    media.addEventListener("change", sync);
-
-    return () => media.removeEventListener("change", sync);
-  }, []);
-
-  return isMobile;
-}
-
-function useMobileMotionReady() {
-  const motionReady = useMotionReady();
-  const isMobile = useMobileViewport();
-
-  return motionReady && isMobile;
-}
-
-function useCursorWave<T extends HTMLElement>(intensity = 14) {
-  const motionReady = useMotionReady();
-  const [canHover, setCanHover] = useState(false);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 155, damping: 16, mass: 0.45 });
-  const springY = useSpring(y, { stiffness: 155, damping: 16, mass: 0.45 });
-  const rotateX = useTransform(springY, (latest) => latest * -0.32);
-  const rotateY = useTransform(springX, (latest) => latest * 0.32);
-  const rotateZ = useTransform(springX, (latest) => latest * 0.045);
-  const canInteract = motionReady && canHover;
-
-  useEffect(() => {
-    const media = globalThis.matchMedia("(hover: hover) and (pointer: fine)");
-    const sync = () => setCanHover(media.matches);
-
-    sync();
-    media.addEventListener("change", sync);
-
-    return () => media.removeEventListener("change", sync);
-  }, []);
-
-  function onPointerMove(event: React.PointerEvent<T>) {
-    if (!canInteract) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const offsetX = event.clientX - rect.left - rect.width / 2;
-    const offsetY = event.clientY - rect.top - rect.height / 2;
-    const wave = Math.sin((event.clientX + event.clientY) / 42) * 2.5;
-
-    x.set((offsetX / rect.width) * intensity * 2 + wave);
-    y.set((offsetY / rect.height) * intensity * 2 - wave);
-  }
-
-  function onPointerLeave() {
-    x.set(0);
-    y.set(0);
-  }
-
-  return {
-    reduce: !canInteract,
-    style: !canInteract
-      ? undefined
-      : {
-          x: springX,
-          y: springY,
-          rotateX,
-          rotateY,
-          rotateZ,
-          transformPerspective: 900,
-        },
-    onPointerMove,
-    onPointerLeave,
-  };
-}
-
-function MagneticSurface({
-  children,
-  className,
-  intensity = 12,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  intensity?: number;
-}) {
-  const magnetic = useCursorWave<HTMLDivElement>(intensity);
-  const mobileMotionReady = useMobileMotionReady();
-
-  return (
-    <motion.div
-      style={magnetic.style}
-      onPointerMove={magnetic.onPointerMove}
-      onPointerLeave={magnetic.onPointerLeave}
-      whileHover={magnetic.reduce ? undefined : { scale: 1.018 }}
-      whileTap={mobileMotionReady ? { scale: 0.985, y: -1 } : undefined}
-      transition={{ type: "spring", stiffness: 240, damping: 18 }}
-      className={cx("will-change-transform", className)}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-function MagneticButton({
+function PreviewButton({
   children,
   className,
   onClick,
@@ -407,78 +292,36 @@ function MagneticButton({
   ariaLabel?: string;
   ariaExpanded?: boolean;
 }) {
-  const magnetic = useCursorWave<HTMLButtonElement>(9);
-  const mobileMotionReady = useMobileMotionReady();
-
   return (
-    <motion.button
+    <button
       type={type}
       onClick={onClick}
-      style={magnetic.style}
-      onPointerMove={magnetic.onPointerMove}
-      onPointerLeave={magnetic.onPointerLeave}
-      whileHover={magnetic.reduce ? undefined : { scale: 1.04 }}
-      whileTap={magnetic.reduce ? (mobileMotionReady ? { scale: 0.97 } : undefined) : { scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 320, damping: 20 }}
       className={className}
       aria-label={ariaLabel}
       aria-expanded={ariaExpanded}
     >
       {children}
-    </motion.button>
+    </button>
   );
 }
 
-function Reveal({
+function SectionReveal({
   children,
   className,
-  delay = 0,
-  instant = false,
-  mobileOnly = false,
 }: {
   children: React.ReactNode;
   className?: string;
-  delay?: number;
-  instant?: boolean;
-  mobileOnly?: boolean;
 }) {
-  const elementRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const element = elementRef.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-
-        setIsVisible(true);
-        observer.disconnect();
-      },
-      {
-        threshold: 0.06,
-        rootMargin: "0px 0px -5% 0px",
-      },
-    );
-
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div
-      ref={elementRef}
-      className={cx(
-        "scroll-reveal",
-        !instant && !mobileOnly && "scroll-reveal-desktop",
-        isVisible && "is-visible",
-        className,
-      )}
-      style={{ "--reveal-delay": `${delay}s` } as React.CSSProperties}
+    <motion.div
+      className={cx("section-reveal", className)}
+      initial={sectionRevealInitial}
+      whileInView={sectionRevealVisible}
+      viewport={sectionRevealViewport}
+      transition={sectionRevealTransition}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
@@ -503,16 +346,14 @@ function SectionIntro({
   title,
   copy,
   center = false,
-  instant = false,
 }: {
   eyebrow?: string;
   title: string;
   copy?: string;
   center?: boolean;
-  instant?: boolean;
 }) {
   return (
-    <Reveal instant={instant} className={cx("mb-7 max-w-3xl lg:mb-9", center && "mx-auto text-center")}>
+    <SectionReveal className={cx("mb-7 max-w-3xl lg:mb-9", center && "mx-auto text-center")}>
       {eyebrow ? (
         <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-sky-200">{eyebrow}</p>
       ) : null}
@@ -524,7 +365,7 @@ function SectionIntro({
           {copy}
         </p>
       ) : null}
-    </Reveal>
+    </SectionReveal>
   );
 }
 
@@ -539,31 +380,12 @@ function CTA({
   variant?: "primary" | "secondary";
   onClick?: () => void;
 }) {
-  const magnetic = useCursorWave<HTMLAnchorElement>(12);
-  const mobileMotionReady = useMobileMotionReady();
-  const mobileTap =
-    mobileMotionReady
-      ? {
-          scale: 0.975,
-          boxShadow:
-            variant === "primary"
-              ? "0 18px 62px rgba(125, 211, 252, 0.28)"
-              : "0 16px 48px rgba(125, 211, 252, 0.14)",
-        }
-      : undefined;
-
   return (
-    <motion.a
+    <a
       href={href}
       onClick={onClick}
-      style={magnetic.style}
-      onPointerMove={magnetic.onPointerMove}
-      onPointerLeave={magnetic.onPointerLeave}
-      whileHover={magnetic.reduce ? undefined : { scale: 1.055 }}
-      whileTap={magnetic.reduce ? mobileTap : { scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 320, damping: 24 }}
       className={cx(
-        "group inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full px-5 text-sm font-semibold outline-none transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:ring-2 focus-visible:ring-sky-200 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070a11] sm:w-auto sm:px-6",
+        "group inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full px-5 text-sm font-semibold outline-none transition-[transform,opacity,background-color,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-sky-200 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070a11] sm:w-auto sm:px-6",
         variant === "primary"
           ? "bg-sky-300 text-[#061018] shadow-[0_18px_58px_rgba(125,211,252,0.2)] hover:bg-sky-200"
           : "border border-white/12 bg-white/[0.045] text-zinc-50 hover:border-sky-200/40 hover:bg-white/[0.075]"
@@ -579,7 +401,7 @@ function CTA({
       >
         &gt;
       </span>
-    </motion.a>
+    </a>
   );
 }
 
@@ -660,15 +482,11 @@ function PaymentSymbol({ brand }: { brand: PaymentBrand }) {
 }
 
 function DMVOFFGRIDPreview() {
-  const motionReady = useMotionReady();
-
   return (
     <div className="relative h-full min-h-[260px] overflow-hidden rounded-[22px] border border-white/10 bg-[#080d14] p-3 sm:min-h-[300px] sm:rounded-[24px] sm:p-4">
-      <motion.div
+      <div
         aria-hidden="true"
-        className="absolute inset-x-10 top-10 h-52 rounded-full bg-orange-400/18 blur-3xl"
-        animate={motionReady ? { opacity: [0.35, 0.78, 0.35], scale: [0.92, 1.08, 0.92] } : undefined}
-        transition={motionReady ? { duration: 6, repeat: Infinity, ease: "easeInOut" } : undefined}
+        className="absolute inset-x-4 top-0 h-64 bg-[radial-gradient(ellipse_at_center,rgba(251,146,60,0.18),transparent_68%)]"
       />
       <div className="relative rounded-[20px] border border-white/12 bg-[#10141c] shadow-[0_28px_80px_rgba(0,0,0,0.35)]">
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
@@ -687,16 +505,14 @@ function DMVOFFGRIDPreview() {
             Join the community
           </div>
           <div className="mt-6 grid grid-cols-3 gap-2">
-            {["Events", "Trails", "Gear"].map((item, index) => (
-              <motion.div
+            {["Events", "Trails", "Gear"].map((item) => (
+              <div
                 key={item}
                 className="rounded-2xl border border-white/10 bg-white/[0.055] p-3"
-                animate={motionReady ? { y: [0, -4, 0] } : undefined}
-                transition={motionReady ? { duration: 4 + index, repeat: Infinity, ease: "easeInOut" } : undefined}
               >
                 <p className="text-xs font-semibold text-zinc-200">{item}</p>
                 <div className="mt-6 h-1 rounded-full bg-orange-200/60" />
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -707,7 +523,6 @@ function DMVOFFGRIDPreview() {
 
 function StudentPreview({ compact = false }: { compact?: boolean }) {
   const [active, setActive] = useState("Projects");
-  const motionReady = useMotionReady();
   const tabs = ["About", "Projects", "Resume", "GitHub"];
 
   return (
@@ -720,7 +535,7 @@ function StudentPreview({ compact = false }: { compact?: boolean }) {
         <div className="p-3 sm:p-5">
           <div className="flex flex-wrap gap-2">
             {tabs.map((tab) => (
-              <MagneticButton
+              <PreviewButton
                 key={tab}
                 onClick={() => setActive(tab)}
                 className={cx(
@@ -731,7 +546,7 @@ function StudentPreview({ compact = false }: { compact?: boolean }) {
                 )}
               >
                 {tab}
-              </MagneticButton>
+              </PreviewButton>
             ))}
           </div>
 
@@ -745,11 +560,8 @@ function StudentPreview({ compact = false }: { compact?: boolean }) {
                 Computer science student building web apps, research tools, and fast prototypes.
               </p>
             </div>
-            <motion.div
+            <div
               key={active}
-              initial={motionReady ? { opacity: 0.45, y: 10 } : false}
-              animate={motionReady ? { opacity: 1, y: 0 } : undefined}
-              transition={motionReady ? { duration: 0.32, ease: [0.22, 1, 0.36, 1] } : undefined}
               className="rounded-[20px] border border-sky-200/18 bg-sky-300/[0.075] p-4"
             >
               <div className="flex items-center justify-between">
@@ -763,7 +575,7 @@ function StudentPreview({ compact = false }: { compact?: boolean }) {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
@@ -772,7 +584,6 @@ function StudentPreview({ compact = false }: { compact?: boolean }) {
 }
 
 function BiomedicalPreview() {
-  const motionReady = useMotionReady();
   const bars = [28, 54, 38, 72, 34, 66, 44, 82, 36, 58, 30, 68, 42, 74];
 
   return (
@@ -799,21 +610,10 @@ function BiomedicalPreview() {
           <div className="absolute inset-x-6 top-8 h-px bg-emerald-200/20" />
           <div className="flex h-36 items-center gap-2">
             {bars.map((height, index) => (
-              <motion.span
+              <span
                 key={`${height}-${index}`}
                 className="w-full rounded-full bg-emerald-300/70"
                 style={{ height }}
-                animate={motionReady ? { scaleY: [0.82, 1.14, 0.82] } : undefined}
-                transition={
-                  motionReady
-                    ? {
-                        duration: 2.2,
-                        delay: index * 0.045,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }
-                    : undefined
-                }
               />
             ))}
           </div>
@@ -831,7 +631,6 @@ function BiomedicalPreview() {
 }
 
 function FinancePreview() {
-  const motionReady = useMotionReady();
   const rows = [
     ["Audit prep", "$14.2k", "72%"],
     ["Forecast", "$8.7k", "58%"],
@@ -840,11 +639,9 @@ function FinancePreview() {
 
   return (
     <div className="relative min-h-[260px] overflow-hidden rounded-[22px] border border-white/10 bg-[#080d14] p-3 sm:min-h-[280px] sm:rounded-[24px] sm:p-4">
-      <motion.div
+      <div
         aria-hidden="true"
-        className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-blue-500/18 blur-3xl"
-        animate={motionReady ? { opacity: [0.28, 0.68, 0.28], scale: [0.95, 1.08, 0.95] } : undefined}
-        transition={motionReady ? { duration: 5.8, repeat: Infinity, ease: "easeInOut" } : undefined}
+        className="absolute -right-12 -top-16 h-72 w-72 bg-[radial-gradient(circle,rgba(59,130,246,0.2),transparent_68%)]"
       />
       <div className="relative flex h-full flex-col rounded-[20px] border border-white/10 bg-[#0d1520] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] sm:p-5">
         <div className="flex items-start gap-4">
@@ -874,27 +671,22 @@ function FinancePreview() {
             </span>
           </div>
           <div className="mt-4 grid gap-2.5">
-            {rows.map(([label, value, width], index) => (
-              <motion.div
+            {rows.map(([label, value, width]) => (
+              <div
                 key={label}
                 className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.045] px-3 py-2.5"
-                animate={motionReady ? { x: [0, 2, 0] } : undefined}
-                transition={motionReady ? { duration: 3.8 + index * 0.35, repeat: Infinity, ease: "easeInOut" } : undefined}
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-zinc-100">{label}</p>
                   <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
-                    <motion.span
+                    <span
                       className="block h-full rounded-full bg-blue-300/80"
                       style={{ width }}
-                      initial={false}
-                      animate={motionReady ? { scaleX: [0.92, 1, 0.92] } : undefined}
-                      transition={motionReady ? { duration: 3.2, repeat: Infinity, ease: "easeInOut" } : undefined}
                     />
                   </div>
                 </div>
                 <p className="font-mono text-sm font-semibold text-blue-100">{value}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -912,7 +704,6 @@ function FinancePreview() {
 }
 
 function BasedFitPreview() {
-  const motionReady = useMotionReady();
   const resultRows = [
     ["#1", "Halal Eatz", "Chantilly burger board", "9.5", "border-yellow-300/70 bg-yellow-300/[0.14] text-yellow-100 shadow-[0_0_34px_rgba(250,204,21,0.18),inset_0_1px_0_rgba(255,255,255,0.08)]"],
     ["#2", "Charred", "Herndon burger board", "8.2", "border-amber-400/45 bg-amber-400/[0.08] text-amber-200"],
@@ -933,6 +724,7 @@ function BasedFitPreview() {
             alt="Based & Fit"
             width={983}
             height={157}
+            sizes="(max-width: 1023px) calc(100vw - 5rem), 24rem"
             className="h-auto w-full max-w-[19rem] object-contain"
           />
           <div>
@@ -1010,12 +802,10 @@ function BasedFitPreview() {
             </span>
           </div>
           <div className="mt-3 grid gap-2.5">
-            {resultRows.map(([rank, name, board, score, tone], index) => (
-              <motion.div
+            {resultRows.map(([rank, name, board, score, tone]) => (
+              <div
                 key={name}
                 className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border p-3 ${tone}`}
-                animate={motionReady ? { x: [0, index === 0 ? 3 : 1, 0] } : undefined}
-                transition={motionReady ? { duration: 3.8 + index * 0.35, repeat: Infinity, ease: "easeInOut" } : undefined}
               >
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-yellow-400 text-xs font-black text-black">
                   {rank}
@@ -1027,7 +817,7 @@ function BasedFitPreview() {
                 <span className="rounded-xl border border-current px-3 py-2 font-mono text-sm font-black">
                   {score}
                 </span>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -1045,52 +835,27 @@ function CasePreview({ id }: { id: CaseId }) {
 }
 
 function HeroMockup() {
-  const motionReady = useMotionReady();
-  const isMobile = useMobileViewport();
-  const floatAnimation = isMobile ? { y: [0, -6, 0], rotate: [0.2, 0, 0.2] } : { y: [0, -10, 0], rotate: [0.4, 0, 0.4] };
-  const labelFloatAnimation = isMobile ? { y: [0, 4, 0] } : { y: [0, 8, 0] };
-
   return (
-    <motion.div
-      initial={false}
-      animate={motionReady ? floatAnimation : undefined}
-      transition={
-        motionReady
-          ? {
-              y: { duration: 8, repeat: Infinity, ease: "easeInOut" },
-              rotate: { duration: 8, repeat: Infinity, ease: "easeInOut" },
-            }
-          : undefined
-      }
-      whileHover={motionReady ? { y: -14, scale: 1.012 } : undefined}
-      className="relative mx-auto w-full max-w-[23rem] min-w-0 sm:max-w-none"
-    >
-      <motion.div
+    <div className="relative mx-auto w-full max-w-[23rem] min-w-0 sm:max-w-none">
+      <div
         aria-hidden="true"
-        className="absolute -inset-4 rounded-[36px] bg-sky-300/12 blur-3xl sm:-inset-8 sm:rounded-[44px]"
-        animate={motionReady ? { opacity: [0.38, 0.72, 0.38] } : undefined}
-        transition={motionReady ? { duration: 5, repeat: Infinity, ease: "easeInOut" } : undefined}
+        className="absolute -inset-8 bg-[radial-gradient(ellipse_at_center,rgba(125,211,252,0.14),transparent_70%)]"
       />
-      <MagneticSurface intensity={14}>
+      <div>
         <div className="relative rounded-[28px] border border-white/14 bg-white/[0.055] p-1.5 shadow-[0_36px_130px_rgba(8,16,28,0.72)] sm:rounded-[34px] sm:p-2">
           <StudentPreview compact />
         </div>
-      </MagneticSurface>
-      <motion.div
-        className="absolute -bottom-3 left-3 max-w-[calc(100%-1.5rem)] rounded-2xl border border-white/12 bg-[#0b111b] px-3 py-2.5 shadow-[0_20px_70px_rgba(0,0,0,0.34)] sm:-bottom-4 sm:left-5 sm:px-4 sm:py-3"
-        animate={motionReady ? labelFloatAnimation : undefined}
-        transition={motionReady ? { duration: 6, repeat: Infinity, ease: "easeInOut" } : undefined}
-      >
+      </div>
+      <div className="absolute -bottom-3 left-3 max-w-[calc(100%-1.5rem)] rounded-2xl border border-white/12 bg-[#0b111b] px-3 py-2.5 shadow-[0_20px_70px_rgba(0,0,0,0.34)] sm:-bottom-4 sm:left-5 sm:px-4 sm:py-3">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-sky-200">Live website preview</p>
         <p className="mt-1 text-sm font-semibold text-zinc-50">Portfolios, businesses, brands</p>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 
 function MobileNav() {
   const [open, setOpen] = useState(false);
-  const motionReady = useMotionReady();
   const menuId = "mobile-navigation-menu";
 
   return (
@@ -1119,129 +884,71 @@ function MobileNav() {
         </span>
       </button>
 
-      <AnimatePresence initial={false}>
-        {open ? (
-          <>
-            <motion.div
-              key="mobile-nav-backdrop"
-              aria-hidden="true"
-              initial={motionReady ? { opacity: 0 } : false}
-              animate={motionReady ? { opacity: 1 } : undefined}
-              exit={motionReady ? { opacity: 0 } : undefined}
-              transition={{ duration: 0.18 }}
-              className="fixed inset-0 z-40 bg-[#030712]/18 lg:hidden"
-              onClick={() => setOpen(false)}
-            />
-            <motion.div
-              key="mobile-nav-panel"
-              id={menuId}
-              initial={motionReady ? { opacity: 0, y: -8, scale: 0.98 } : false}
-              animate={motionReady ? { opacity: 1, y: 0, scale: 1 } : undefined}
-              exit={motionReady ? { opacity: 0, y: -6, scale: 0.98 } : undefined}
-              transition={motionReady ? { duration: 0.22, ease: [0.22, 1, 0.36, 1] } : undefined}
-              className="absolute right-0 top-[calc(100%+0.75rem)] z-[55] w-[min(calc(100vw-1.5rem),22rem)] overflow-hidden rounded-[28px] border border-white/14 bg-[#0b1019]/96 p-2 shadow-[0_28px_90px_rgba(0,0,0,0.46)] backdrop-blur-2xl lg:hidden"
-            >
-              <motion.div
-                initial="hidden"
-                animate="show"
-                exit="hidden"
-                variants={{
-                  hidden: {},
-                  show: {
-                    transition: { staggerChildren: 0.035, ease: [0.22, 1, 0.36, 1] },
-                  },
-                }}
-                className="grid gap-1"
-              >
-                {navItems.map(([label, href]) => (
-                  <motion.a
-                    key={label}
-                    href={href}
-                    variants={{
-                      hidden: motionReady ? { opacity: 0, y: 8 } : {},
-                      show: motionReady ? { opacity: 1, y: 0 } : {},
-                    }}
-                    onClick={() => setOpen(false)}
-                    className="flex min-h-12 items-center rounded-[20px] px-4 text-base font-semibold text-zinc-50 transition active:scale-[0.99] active:bg-white/[0.08] hover:bg-white/[0.07]"
-                  >
-                    {label}
-                  </motion.a>
-                ))}
-                <div className="mt-2 border-t border-white/10 px-1 pt-3">
-                  <CTA href="#contact" onClick={() => setOpen(false)}>
-                    Start a Website
-                  </CTA>
-                </div>
-              </motion.div>
-            </motion.div>
-          </>
-        ) : null}
-      </AnimatePresence>
+      {open ? (
+        <>
+          <div
+            aria-hidden="true"
+            className="fixed inset-0 z-40 bg-[#030712]/18 lg:hidden"
+            onClick={() => setOpen(false)}
+          />
+          <div
+            id={menuId}
+            className="absolute right-0 top-[calc(100%+0.75rem)] z-[55] w-[min(calc(100vw-1.5rem),22rem)] overflow-hidden rounded-[28px] border border-white/14 bg-[#0b1019] p-2 shadow-[0_8px_24px_rgba(0,0,0,0.42)] lg:hidden"
+          >
+            <div className="grid gap-1">
+              {navItems.map(([label, href]) => (
+                <a
+                  key={label}
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  className="flex min-h-12 items-center rounded-[20px] px-4 text-base font-semibold text-zinc-50 transition-[transform,opacity,background-color] duration-200 active:scale-[0.99] active:bg-white/[0.08] hover:bg-white/[0.07]"
+                >
+                  {label}
+                </a>
+              ))}
+              <div className="mt-2 border-t border-white/10 px-1 pt-3">
+                <CTA href="#contact" onClick={() => setOpen(false)}>
+                  Start a Website
+                </CTA>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : null}
     </>
   );
 }
 
 function FAQItem({ item, index }: { item: (typeof faqs)[number]; index: number }) {
   const [open, setOpen] = useState(index === 0);
-  const motionReady = useMotionReady();
 
   return (
-    <motion.div
-      layout={motionReady}
-      className="rounded-[24px] border border-white/10 bg-white/[0.04] p-1 transition-colors hover:border-sky-200/24"
-    >
-      <MagneticButton
+    <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-1 transition-colors hover:border-sky-200/24">
+      <PreviewButton
         onClick={() => setOpen((value) => !value)}
         className="flex w-full items-center justify-between gap-4 rounded-[20px] px-5 py-4 text-left text-base font-semibold text-zinc-50 outline-none focus-visible:ring-2 focus-visible:ring-sky-200"
+        ariaExpanded={open}
       >
         <span>{item.question}</span>
-        <motion.span
+        <span
           aria-hidden="true"
-          animate={motionReady ? { rotate: open ? 45 : 0 } : undefined}
-          transition={motionReady ? { duration: 0.25, ease: [0.22, 1, 0.36, 1] } : undefined}
-          className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sky-300/10 text-sky-200"
+          className={cx(
+            "grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sky-300/10 text-sky-200 transition-transform duration-200",
+            open && "rotate-45",
+          )}
         >
           +
-        </motion.span>
-      </MagneticButton>
-      <AnimatePresence initial={false}>
-        {open ? (
-          <motion.div
-            initial={motionReady ? { height: 0, opacity: 0 } : false}
-            animate={motionReady ? { height: "auto", opacity: 1 } : undefined}
-            exit={motionReady ? { height: 0, opacity: 0 } : undefined}
-            transition={motionReady ? { duration: 0.34, ease: [0.22, 1, 0.36, 1] } : undefined}
-            className="overflow-hidden"
-          >
-            <p className="px-5 pb-5 text-sm leading-6 text-zinc-300">{item.answer}</p>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-    </motion.div>
+        </span>
+      </PreviewButton>
+      {open ? <p className="px-5 pb-5 text-sm leading-6 text-zinc-300">{item.answer}</p> : null}
+    </div>
   );
 }
 
 export default function Home() {
-  const motionReady = useMotionReady();
-  const mobileMotionReady = useMobileMotionReady();
-
-  function handleGalaxyPointer(event: React.PointerEvent<HTMLElement>) {
-    if (!motionReady) return;
-    const shiftX = ((event.clientX / globalThis.innerWidth) - 0.5) * 100;
-    const shiftY = ((event.clientY / globalThis.innerHeight) - 0.5) * 100;
-    event.currentTarget.style.setProperty("--galaxy-x", `${event.clientX}px`);
-    event.currentTarget.style.setProperty("--galaxy-y", `${event.clientY}px`);
-    event.currentTarget.style.setProperty("--galaxy-shift-x", `${shiftX.toFixed(2)}px`);
-    event.currentTarget.style.setProperty("--galaxy-shift-y", `${shiftY.toFixed(2)}px`);
-    event.currentTarget.style.setProperty("--galaxy-art-x", `${(-shiftX * 0.12).toFixed(2)}px`);
-    event.currentTarget.style.setProperty("--galaxy-art-y", `${(-shiftY * 0.1).toFixed(2)}px`);
-  }
-
   return (
-    <main
-      className="galaxy-mode relative min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-[#030712] text-zinc-100"
-      onPointerMove={handleGalaxyPointer}
-    >
+    <MotionConfig reducedMotion="user">
+      <main className="galaxy-mode relative min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-[#030712] text-zinc-100">
       <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_14%_8%,rgba(59,130,246,0.18),transparent_28%),radial-gradient(circle_at_84%_12%,rgba(168,85,247,0.14),transparent_26%),radial-gradient(circle_at_48%_88%,rgba(14,165,233,0.12),transparent_34%),linear-gradient(180deg,#030712_0%,#07111f_42%,#040815_100%)]" />
       <AnimatedBackground />
       <div className="site-grain" />
@@ -1256,7 +963,6 @@ export default function Home() {
                 fill
                 sizes="36px"
                 className="object-cover"
-                preload
               />
             </span>
             <span className="max-w-[10rem] truncate text-sm sm:max-w-none sm:text-base">Sites by Roheen</span>
@@ -1282,9 +988,9 @@ export default function Home() {
       </header>
 
       <section className="relative z-10 px-4 pb-8 pt-3 sm:px-6 sm:pt-5 lg:px-8 lg:pb-10 lg:pt-7">
-        <div className="mx-auto grid w-full max-w-7xl items-center gap-7 lg:min-h-[400px] lg:grid-cols-[0.94fr_1.06fr]">
-          <div className="min-w-0 max-w-5xl">
-            <Reveal instant>
+        <SectionReveal className="mx-auto w-full max-w-7xl">
+          <div className="grid items-center gap-7 lg:min-h-[400px] lg:grid-cols-[0.94fr_1.06fr]">
+            <div className="min-w-0 max-w-5xl">
               <div className="mb-4">
                 <p className="inline-flex w-fit items-center rounded-full border border-sky-200/35 bg-sky-200/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-sky-100">
                   Limited-Time Launch Pricing
@@ -1302,33 +1008,24 @@ export default function Home() {
                   View Plans
                 </CTA>
               </div>
-            </Reveal>
+            </div>
+
+            <div className="min-w-0">
+              <HeroMockup />
+            </div>
           </div>
 
-          <Reveal mobileOnly delay={0.08} className="min-w-0">
-            <HeroMockup />
-          </Reveal>
-        </div>
-
-        <Reveal instant delay={0.12} className="mx-auto mt-5 w-full max-w-7xl">
           <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.045] p-3">
-            <motion.div
+            <div
               aria-hidden="true"
-              className="absolute bottom-0 left-0 h-px w-full origin-left bg-sky-200/70"
-              animate={motionReady ? { scaleX: [0.06, 1, 0.06], opacity: [0.35, 0.9, 0.35] } : undefined}
-              transition={motionReady ? { duration: 5, repeat: Infinity, ease: "easeInOut" } : undefined}
+              className="absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-sky-200/70 to-transparent"
             />
             <div className="grid gap-3 sm:grid-cols-2">
               {[
                 { name: "Ozza Bejjaji", review: "🔥🔥🔥", image: "/images/roheen-portrait.png", alt: "Ozza Bejjaji" },
                 { name: "BasedAndFit", review: "This looks really nice!", image: "/images/based-and-fit-review.jpeg", alt: "Based & Fit logo" },
-              ].map((item, index) => (
-                <Reveal key={item.name} mobileOnly delay={index * 0.05}>
-                  <motion.div
-                    whileTap={mobileMotionReady ? { scale: 0.985, y: -1 } : undefined}
-                    transition={{ type: "spring", stiffness: 320, damping: 22 }}
-                    className="rounded-[20px] bg-[#0d1420]/76 px-4 py-3"
-                  >
+              ].map((item) => (
+                <div key={item.name} className="rounded-[20px] bg-[#0d1420]/76 px-4 py-3">
                     <p className="text-sm tracking-[0.18em] text-amber-200" aria-label="5 out of 5 stars">★★★★★</p>
                     <p className="mt-2 text-sm font-medium text-zinc-100">“{item.review}”</p>
                     <div className="mt-2 flex items-center gap-2 text-xs font-semibold text-sky-200">
@@ -1337,38 +1034,34 @@ export default function Home() {
                         alt={item.alt}
                         width={24}
                         height={24}
+                        sizes="24px"
                         className="h-6 w-6 rounded-full border border-sky-200/30 object-cover"
                       />
                       <span>{item.name}</span>
                     </div>
-                  </motion.div>
-                </Reveal>
+                </div>
               ))}
             </div>
           </div>
-        </Reveal>
+        </SectionReveal>
       </section>
 
       <SectionShell id="work" className="pt-4 lg:pt-6">
         <SectionIntro
-          instant
           eyebrow="Examples"
           title="Examples for portfolios and businesses."
           copy="Explore live websites and portfolio examples that show the kind of clean, mobile-friendly site I can make for you."
         />
 
         <div className="grid grid-flow-dense gap-5 lg:grid-cols-12">
-          {caseStudies.map((card, index) => (
-            <Reveal key={card.title} instant={index < 2} delay={index * 0.06} className={cx("min-w-0", card.span)}>
-              <MagneticSurface className="h-full" intensity={16}>
-                <motion.a
+          {caseStudies.map((card) => (
+            <div key={card.title} className={cx("min-w-0", card.span)}>
+              <div className="h-full">
+                <a
                   href={card.href}
                   target={card.href.startsWith("http") ? "_blank" : undefined}
                   rel={card.href.startsWith("http") ? "noreferrer" : undefined}
-                  whileHover={motionReady ? { y: -8 } : undefined}
-                  whileTap={mobileMotionReady ? { scale: 0.985, y: -2 } : undefined}
-                  transition={motionReady ? { type: "spring", stiffness: 240, damping: 24 } : undefined}
-                  className="group block h-full rounded-[30px] border border-white/10 bg-white/[0.045] p-2 shadow-[0_26px_90px_rgba(0,0,0,0.24)] outline-none transition-colors duration-500 hover:border-sky-200/30 focus-visible:ring-2 focus-visible:ring-sky-200"
+                  className="group block h-full rounded-[30px] border border-white/10 bg-white/[0.045] p-2 outline-none transition-[transform,opacity,border-color] duration-300 hover:border-sky-200/30 lg:hover:-translate-y-1 focus-visible:ring-2 focus-visible:ring-sky-200"
                 >
                   <div className="relative h-full overflow-hidden rounded-[24px] bg-[#0d1420]">
                     <CasePreview id={card.id} />
@@ -1392,9 +1085,9 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                </motion.a>
-              </MagneticSurface>
-            </Reveal>
+                </a>
+              </div>
+            </div>
           ))}
         </div>
       </SectionShell>
@@ -1407,21 +1100,16 @@ export default function Home() {
         />
 
         <div className="grid grid-flow-dense gap-4 md:grid-cols-12">
-          {benefits.map((benefit, index) => (
-            <Reveal key={benefit.title} delay={index * 0.045} className={benefit.span}>
-              <MagneticSurface className="h-full" intensity={14}>
-                <motion.article
-                  whileHover={motionReady ? { y: -6 } : undefined}
-                  whileTap={mobileMotionReady ? { scale: 0.985, y: -2 } : undefined}
-                  transition={motionReady ? { type: "spring", stiffness: 260, damping: 24 } : undefined}
-                  className="h-full rounded-[24px] border border-white/10 bg-white/[0.045] p-5 transition-colors duration-500 hover:border-sky-200/30 sm:rounded-[28px] sm:p-6"
-                >
+          {benefits.map((benefit) => (
+            <div key={benefit.title} className={benefit.span}>
+              <div className="h-full">
+                <article className="h-full rounded-[24px] border border-white/10 bg-white/[0.045] p-5 transition-[transform,opacity,border-color] duration-300 hover:border-sky-200/30 lg:hover:-translate-y-1 sm:rounded-[28px] sm:p-6">
                   <CodedMark tone={benefit.tone} />
                   <h3 className="mt-6 text-2xl font-semibold tracking-[-0.03em] text-zinc-50 sm:mt-8">{benefit.title}</h3>
                   <p className="mt-3 max-w-lg text-sm leading-6 text-zinc-300">{benefit.copy}</p>
-                </motion.article>
-              </MagneticSurface>
-            </Reveal>
+                </article>
+              </div>
+            </div>
           ))}
         </div>
       </SectionShell>
@@ -1435,26 +1123,21 @@ export default function Home() {
         />
 
         <div className="grid gap-5 lg:grid-cols-2">
-          {plans.map((plan, index) => (
-            <Reveal key={plan.name} delay={index * 0.08}>
-              <MagneticSurface className="h-full" intensity={13}>
-                <motion.article
-                  whileHover={motionReady ? { y: -8 } : undefined}
-                  whileTap={mobileMotionReady ? { scale: 0.985, y: -2 } : undefined}
-                  transition={motionReady ? { type: "spring", stiffness: 230, damping: 24 } : undefined}
+          {plans.map((plan) => (
+            <div key={plan.name}>
+              <div className="h-full">
+                <article
                   className={cx(
-                    "relative h-full rounded-[28px] border p-1.5 sm:rounded-[34px] sm:p-2",
+                    "relative h-full rounded-[28px] border p-1.5 transition-[transform,opacity] duration-300 lg:hover:-translate-y-1 sm:rounded-[34px] sm:p-2",
                     plan.featured
                       ? "border-sky-200/35 bg-sky-300/[0.08] shadow-[0_32px_130px_rgba(56,189,248,0.16)]"
                       : "border-white/10 bg-white/[0.04]"
                   )}
                 >
                   {plan.featured ? (
-                    <motion.div
+                    <div
                       aria-hidden="true"
                       className="absolute inset-0 rounded-[28px] border border-sky-200/20 sm:rounded-[34px]"
-                      animate={motionReady ? { opacity: [0.25, 0.78, 0.25], scale: [0.992, 1.01, 0.992] } : undefined}
-                      transition={motionReady ? { duration: 4.5, repeat: Infinity, ease: "easeInOut" } : undefined}
                     />
                   ) : null}
                   <div className="relative flex h-full flex-col rounded-[22px] bg-[#0c121d]/94 p-5 sm:rounded-[26px] sm:p-8">
@@ -1483,17 +1166,15 @@ export default function Home() {
                       </CTA>
                     </div>
                   </div>
-                </motion.article>
-              </MagneticSurface>
-            </Reveal>
+                </article>
+              </div>
+            </div>
           ))}
         </div>
-        <Reveal>
-          <p className="mx-auto mt-6 max-w-3xl text-center text-sm leading-6 text-zinc-400">
-            Every project is different. Pricing is flexible and based on what you need, how many
-            sections you want, and whether you need ongoing updates.
-          </p>
-        </Reveal>
+        <p className="mx-auto mt-6 max-w-3xl text-center text-sm leading-6 text-zinc-400">
+          Every project is different. Pricing is flexible and based on what you need, how many
+          sections you want, and whether you need ongoing updates.
+        </p>
       </SectionShell>
 
       <SectionShell id="process">
@@ -1507,23 +1188,18 @@ export default function Home() {
             <div className="absolute bottom-8 left-5 top-8 hidden w-px bg-sky-200/20 sm:block" />
             <div className="grid gap-4">
               {processSteps.map((step, index) => (
-                <Reveal key={step.title} delay={index * 0.05}>
-                  <MagneticSurface intensity={10}>
-                    <motion.article
-                      whileHover={motionReady ? { x: 6 } : undefined}
-                      whileTap={mobileMotionReady ? { scale: 0.985, x: 2 } : undefined}
-                      transition={motionReady ? { type: "spring", stiffness: 260, damping: 24 } : undefined}
-                      className="relative rounded-[26px] border border-white/10 bg-white/[0.045] p-5 sm:ml-12"
-                    >
+                <div key={step.title}>
+                  <div>
+                    <article className="relative rounded-[26px] border border-white/10 bg-white/[0.045] p-5 transition-[transform,opacity,border-color] duration-300 lg:hover:translate-x-1 sm:ml-12">
                       <span className="absolute -left-[3.55rem] top-5 hidden h-10 w-10 place-items-center rounded-full border border-sky-200/28 bg-[#0b1019] text-sm font-semibold text-sky-100 sm:grid">
                         {index + 1}
                       </span>
                       <p className="font-mono text-sm text-sky-200 sm:hidden">{String(index + 1).padStart(2, "0")}</p>
                       <h3 className="text-xl font-semibold text-zinc-50">{step.title}</h3>
                       <p className="mt-3 text-sm leading-6 text-zinc-300">{step.copy}</p>
-                    </motion.article>
-                  </MagneticSurface>
-                </Reveal>
+                    </article>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -1537,15 +1213,10 @@ export default function Home() {
           copy="Use the student Stripe link for monthly portfolio sites, or the business Stripe link after we agree on project scope."
         />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {payments.map((payment, index) => (
-            <Reveal key={payment.title} delay={index * 0.06}>
-              <MagneticSurface className="h-full" intensity={12}>
-                <motion.article
-                  whileHover={motionReady ? { y: -6 } : undefined}
-                  whileTap={mobileMotionReady ? { scale: 0.985, y: -2 } : undefined}
-                  transition={motionReady ? { type: "spring", stiffness: 260, damping: 24 } : undefined}
-                  className="h-full rounded-[24px] border border-white/10 bg-white/[0.045] p-5 sm:rounded-[28px] sm:p-6"
-                >
+          {payments.map((payment) => (
+            <div key={payment.title}>
+              <div className="h-full">
+                <article className="h-full rounded-[24px] border border-white/10 bg-white/[0.045] p-5 transition-[transform,opacity,border-color] duration-300 lg:hover:-translate-y-1 sm:rounded-[28px] sm:p-6">
                   <PaymentSymbol brand={payment.brand} />
                   <h3 className="mt-7 text-xl font-semibold text-zinc-50">{payment.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-zinc-300">{payment.copy}</p>
@@ -1563,33 +1234,30 @@ export default function Home() {
                       {payment.value}
                     </code>
                   )}
-                </motion.article>
-              </MagneticSurface>
-            </Reveal>
+                </article>
+              </div>
+            </div>
           ))}
         </div>
-        <Reveal>
-          <p className="mt-6 text-sm leading-6 text-zinc-400">
-            For Venmo/Zelle, include your name and project name in the payment note. Questions before
-            paying? Email{" "}
-            <a
-              href={`mailto:${contactEmail}`}
-              className="font-medium text-zinc-200 underline decoration-sky-200/30 underline-offset-4 transition hover:text-sky-100"
-            >
-              {contactEmail}
-            </a>
-            .
-          </p>
-        </Reveal>
+        <p className="mt-6 text-sm leading-6 text-zinc-400">
+          For Venmo/Zelle, include your name and project name in the payment note. Questions before
+          paying? Email{" "}
+          <a
+            href={`mailto:${contactEmail}`}
+            className="font-medium text-zinc-200 underline decoration-sky-200/30 underline-offset-4 transition hover:text-sky-100"
+          >
+            {contactEmail}
+          </a>
+          .
+        </p>
       </SectionShell>
 
       <SectionShell id="about">
         <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
-          <Reveal>
-            <MagneticSurface intensity={12}>
+          <div>
+            <div>
               <div className="rounded-[28px] border border-white/10 bg-white/[0.045] p-1.5 sm:rounded-[34px] sm:p-2">
-                <div className="relative overflow-hidden rounded-[22px] bg-[#0d1420] p-5 sm:rounded-[26px] sm:p-8">
-                  <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-sky-300/12 blur-3xl" />
+                <div className="relative overflow-hidden rounded-[22px] bg-[radial-gradient(circle_at_100%_0%,rgba(125,211,252,0.12),transparent_38%),#0d1420] p-5 sm:rounded-[26px] sm:p-8">
                   <div className="relative flex items-center gap-5">
                     <div className="grid h-20 w-20 shrink-0 place-items-center rounded-[24px] border border-sky-200/20 bg-sky-300/12 text-2xl font-semibold text-sky-100 sm:h-24 sm:w-24 sm:rounded-[28px] sm:text-3xl">
                       RS
@@ -1610,9 +1278,9 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </MagneticSurface>
-          </Reveal>
-          <Reveal delay={0.1}>
+            </div>
+          </div>
+          <SectionReveal>
             <h2 className="text-balance text-3xl font-semibold leading-[1.02] tracking-[-0.035em] text-zinc-50 sm:text-6xl sm:tracking-[-0.04em]">
               Personal website help without the agency process.
             </h2>
@@ -1632,26 +1300,23 @@ export default function Home() {
                 service pages, menus, and landing pages.
               </p>
             </div>
-          </Reveal>
+          </SectionReveal>
         </div>
       </SectionShell>
 
       <SectionShell id="faq">
         <SectionIntro eyebrow="FAQ" title="Questions people usually ask." center />
-        <Reveal className="mx-auto grid max-w-4xl gap-3">
+        <div className="mx-auto grid max-w-4xl gap-3">
           {faqs.map((faq, index) => (
-            <Reveal key={faq.question} mobileOnly delay={index * 0.035}>
-              <FAQItem item={faq} index={index} />
-            </Reveal>
+            <FAQItem key={faq.question} item={faq} index={index} />
           ))}
-        </Reveal>
+        </div>
       </SectionShell>
 
       <SectionShell id="contact" className="pb-10 lg:pb-16">
-        <Reveal>
-          <MagneticSurface intensity={10}>
-            <div className="relative overflow-hidden rounded-[28px] border border-sky-200/24 bg-sky-300/[0.09] p-5 shadow-[0_40px_150px_rgba(56,189,248,0.15)] sm:rounded-[36px] sm:p-10 lg:p-14">
-              <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-sky-300/16 blur-3xl" />
+        <SectionReveal>
+          <div>
+            <div className="relative overflow-hidden rounded-[28px] border border-sky-200/24 bg-[radial-gradient(circle_at_100%_0%,rgba(125,211,252,0.16),transparent_42%),rgba(125,211,252,0.09)] p-5 sm:rounded-[36px] sm:p-10 lg:p-14">
               <div className="relative max-w-3xl">
                 <h2 className="text-balance text-3xl font-semibold leading-[1.02] tracking-[-0.035em] text-zinc-50 sm:text-6xl sm:tracking-[-0.04em]">
                   Ready to look more professional online?
@@ -1669,29 +1334,27 @@ export default function Home() {
                   </CTA>
                 </div>
                 <div className="mt-7 grid gap-3 sm:grid-cols-2">
-                  <motion.a
+                  <a
                     href={`mailto:${contactEmail}`}
-                    whileTap={mobileMotionReady ? { scale: 0.985 } : undefined}
-                    className="group rounded-[22px] border border-white/10 bg-white/[0.055] p-4 transition hover:border-sky-200/30 hover:bg-white/[0.075]"
+                    className="group rounded-[22px] border border-white/10 bg-white/[0.055] p-4 transition-[transform,opacity,background-color,border-color] duration-300 active:scale-[0.985] hover:border-sky-200/30 hover:bg-white/[0.075]"
                   >
                     <p className="text-sm font-semibold text-sky-200">Email</p>
                     <p className="mt-2 break-all text-base font-semibold text-zinc-50 sm:text-lg">
                       {contactEmail}
                     </p>
-                  </motion.a>
-                  <motion.a
+                  </a>
+                  <a
                     href={contactPhoneHref}
-                    whileTap={mobileMotionReady ? { scale: 0.985 } : undefined}
-                    className="group rounded-[22px] border border-white/10 bg-white/[0.055] p-4 transition hover:border-sky-200/30 hover:bg-white/[0.075]"
+                    className="group rounded-[22px] border border-white/10 bg-white/[0.055] p-4 transition-[transform,opacity,background-color,border-color] duration-300 active:scale-[0.985] hover:border-sky-200/30 hover:bg-white/[0.075]"
                   >
                     <p className="text-sm font-semibold text-sky-200">Phone</p>
                     <p className="mt-2 text-base font-semibold text-zinc-50 sm:text-lg">{contactPhone}</p>
-                  </motion.a>
+                  </a>
                 </div>
               </div>
             </div>
-          </MagneticSurface>
-        </Reveal>
+          </div>
+        </SectionReveal>
       </SectionShell>
 
       <footer className="relative z-10 border-t border-white/10 px-4 py-8 sm:px-6 lg:px-8">
@@ -1716,6 +1379,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </main>
+      </main>
+    </MotionConfig>
   );
 }

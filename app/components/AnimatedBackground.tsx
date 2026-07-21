@@ -1,32 +1,10 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
-type TapSpark = {
-  id: number;
-  x: number;
-  y: number;
-};
-
-const mobileSparkOffsets = [
-  { x: 9, y: -10, delay: 0.03 },
-  { x: -11, y: 8, delay: 0.07 },
-] as const;
-
-function useMounted() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  return mounted;
-}
-
 function useStaticMobileBackground() {
-  const [isStaticMobile, setIsStaticMobile] = useState(false);
+  const [isStaticMobile, setIsStaticMobile] = useState(true);
 
   useEffect(() => {
     const media = globalThis.matchMedia("(max-width: 640px), (pointer: coarse)");
@@ -43,16 +21,11 @@ function useStaticMobileBackground() {
 
 export default function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const sparkIdRef = useRef(0);
-  const lastSparkAtRef = useRef(0);
-  const touchStartRef = useRef<{ id: number; x: number; y: number; time: number } | null>(null);
   const reduce = useReducedMotion();
-  const mounted = useMounted();
   const isStaticMobile = useStaticMobileBackground();
-  const [tapSparks, setTapSparks] = useState<TapSpark[]>([]);
 
   useEffect(() => {
-    if (!mounted || reduce || isStaticMobile) return;
+    if (reduce || isStaticMobile) return;
 
     const canvasElement = canvasRef.current;
     if (!canvasElement) return;
@@ -313,71 +286,7 @@ export default function AnimatedBackground() {
       globalThis.removeEventListener("pointerup", onPointerUp);
       globalThis.removeEventListener("pointercancel", onPointerCancel);
     };
-  }, [mounted, reduce, isStaticMobile]);
-
-  useEffect(() => {
-    if (!mounted || reduce || isStaticMobile) return;
-
-    function isMobileTapEvent(event: PointerEvent) {
-      const isMobileTap = event.pointerType !== "mouse" || globalThis.matchMedia("(pointer: coarse)").matches;
-      return isMobileTap && event.isPrimary;
-    }
-
-    function onMobilePointerDown(event: PointerEvent) {
-      if (!isMobileTapEvent(event)) {
-        touchStartRef.current = null;
-        return;
-      }
-
-      touchStartRef.current = {
-        id: event.pointerId,
-        x: event.clientX,
-        y: event.clientY,
-        time: performance.now(),
-      };
-    }
-
-    function onMobilePointerUp(event: PointerEvent) {
-      if (!isMobileTapEvent(event)) return;
-
-      const start = touchStartRef.current;
-      touchStartRef.current = null;
-      if (!start || start.id !== event.pointerId) return;
-
-      const elapsed = performance.now() - start.time;
-      const distance = Math.hypot(event.clientX - start.x, event.clientY - start.y);
-      if (elapsed > 360 || distance > 16) return;
-
-      const now = performance.now();
-      if (now - lastSparkAtRef.current < 180) return;
-      lastSparkAtRef.current = now;
-
-      const id = sparkIdRef.current;
-      sparkIdRef.current += 1;
-
-      setTapSparks(() => [
-        {
-          id,
-          x: event.clientX,
-          y: event.clientY,
-        },
-      ]);
-    }
-
-    function onMobilePointerCancel() {
-      touchStartRef.current = null;
-    }
-
-    globalThis.addEventListener("pointerdown", onMobilePointerDown, { passive: true });
-    globalThis.addEventListener("pointerup", onMobilePointerUp, { passive: true });
-    globalThis.addEventListener("pointercancel", onMobilePointerCancel, { passive: true });
-
-    return () => {
-      globalThis.removeEventListener("pointerdown", onMobilePointerDown);
-      globalThis.removeEventListener("pointerup", onMobilePointerUp);
-      globalThis.removeEventListener("pointercancel", onMobilePointerCancel);
-    };
-  }, [mounted, reduce, isStaticMobile]);
+  }, [reduce, isStaticMobile]);
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[1] overflow-hidden" aria-hidden="true">
@@ -388,33 +297,6 @@ export default function AnimatedBackground() {
       <div className="galaxy-orbit galaxy-orbit-one" />
       <div className="galaxy-orbit galaxy-orbit-two" />
       <canvas ref={canvasRef} className="galaxy-play-canvas" />
-      <AnimatePresence>
-        {tapSparks.map((spark) => (
-          <motion.div
-            key={spark.id}
-            className="mobile-star-spark"
-            style={{ left: spark.x, top: spark.y }}
-            initial={{ opacity: 0.58, scale: 0.22 }}
-            animate={{ opacity: 0, scale: 1.12 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
-            onAnimationComplete={() => {
-              setTapSparks((current) => current.filter((item) => item.id !== spark.id));
-            }}
-          >
-            <span className="mobile-star-spark-ring" />
-            {mobileSparkOffsets.map((offset) => (
-              <motion.span
-                key={`${spark.id}-${offset.x}-${offset.y}`}
-                className="mobile-star-spark-dot"
-                initial={{ opacity: 0.62, x: 0, y: 0, scale: 0.6 }}
-                animate={{ opacity: 0, x: offset.x, y: offset.y, scale: 0.84 }}
-                transition={{ duration: 0.24, delay: offset.delay, ease: "easeOut" }}
-              />
-            ))}
-          </motion.div>
-        ))}
-      </AnimatePresence>
     </div>
   );
 }
