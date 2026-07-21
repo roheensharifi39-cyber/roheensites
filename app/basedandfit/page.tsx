@@ -114,7 +114,7 @@ function ScorePill({ score }: { score: string }) {
 export default function BasedAndFitPage() {
   return (
     <main className="min-h-[100dvh] bg-[#151410] text-[#f7f2e9]">
-      <header className="sticky top-0 z-30 border-b border-[#f7f2e9]/10 bg-[#151410]/88 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-30 border-b border-[#f7f2e9]/10 bg-[#151410]/96 px-4 py-3 sm:px-6 lg:px-8">
         <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4">
           <a href="#top" className="min-w-0 text-xl font-black tracking-[-0.04em] text-[#f7f2e9]">
             Based & Fit
@@ -168,13 +168,15 @@ export default function BasedAndFitPage() {
           </div>
 
           <div className="relative">
-            <div className="absolute -left-5 top-8 hidden h-32 w-32 rounded-[28px] bg-[#ff5a3d]/24 blur-3xl lg:block" />
+            <div className="absolute -left-16 top-0 hidden h-56 w-56 bg-[radial-gradient(circle,rgba(255,90,61,0.22),transparent_68%)] lg:block" />
             <div className="relative overflow-hidden rounded-[28px] border border-[#f7f2e9]/12 bg-[#211f19] p-2 shadow-[0_40px_140px_rgba(0,0,0,0.38)]">
               <Image
                 src={foodImages.hero}
                 alt="Colorful healthy food spread on a restaurant table"
                 width={1600}
                 height={1200}
+                sizes="(max-width: 1023px) calc(100vw - 2rem), 56vw"
+                quality={82}
                 className="aspect-[4/3] w-full rounded-[22px] object-cover"
                 preload
               />
@@ -211,9 +213,11 @@ export default function BasedAndFitPage() {
               >
                 <Image
                   src={review.image}
-                  alt=""
+                  alt={`${review.title} in ${review.place}`}
                   width={1200}
                   height={780}
+                  sizes="(max-width: 1023px) calc(100vw - 2rem), 50vw"
+                  quality={80}
                   className={`w-full object-cover ${index === 0 ? "aspect-[1.08/1]" : "aspect-[2.2/1]"}`}
                 />
                 <div className="p-5 sm:p-6">
@@ -270,6 +274,8 @@ export default function BasedAndFitPage() {
             alt="Restaurant meal with grilled food and sides"
             width={1400}
             height={900}
+            sizes="(max-width: 1023px) calc(100vw - 2rem), 58vw"
+            quality={80}
             className="aspect-[1.55/1] w-full rounded-[28px] object-cover"
             loading="lazy"
           />
