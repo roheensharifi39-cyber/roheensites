@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AnimatedBackground from "./components/AnimatedBackground";
 
 const navItems = [
@@ -442,31 +442,43 @@ function Reveal({
   instant?: boolean;
   mobileOnly?: boolean;
 }) {
-  const motionReady = useMotionReady();
-  const isMobile = useMobileViewport();
-  const shouldAnimate = motionReady && (isMobile ? true : !instant && !mobileOnly);
-  const revealStart = isMobile ? { opacity: 0, y: 22 } : { opacity: 0.84, y: 28 };
-  const revealTransition = isMobile
-    ? { duration: 0.55, delay, ease: "easeOut" as const }
-    : {
-        duration: 0.72,
-        delay,
-        ease: [0.16, 1, 0.3, 1] as const,
-      };
-  const viewport = isMobile
-    ? { once: true, amount: 0.05, margin: "0px 0px -40px 0px" }
-    : { once: true, amount: 0.05, margin: "0px 0px -8% 0px" };
+  const elementRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const element = elementRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+
+        setIsVisible(true);
+        observer.disconnect();
+      },
+      {
+        threshold: 0.06,
+        rootMargin: "0px 0px -5% 0px",
+      },
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <motion.div
-      className={className}
-      initial={shouldAnimate ? revealStart : false}
-      whileInView={shouldAnimate ? { opacity: 1, y: 0 } : undefined}
-      viewport={viewport}
-      transition={shouldAnimate ? revealTransition : undefined}
+    <div
+      ref={elementRef}
+      className={cx(
+        "scroll-reveal",
+        !instant && !mobileOnly && "scroll-reveal-desktop",
+        isVisible && "is-visible",
+        className,
+      )}
+      style={{ "--reveal-delay": `${delay}s` } as React.CSSProperties}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 

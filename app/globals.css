@@ -37,6 +37,27 @@ body {
   color: #f8fafc;
 }
 
+.scroll-reveal {
+  opacity: 1;
+  transform: none;
+}
+
+@media (min-width: 641px) {
+  .scroll-reveal-desktop {
+    opacity: 0;
+    transform: translate3d(0, 1.75rem, 0);
+    transition:
+      opacity 720ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0s),
+      transform 720ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0s);
+    will-change: opacity, transform;
+  }
+
+  .scroll-reveal-desktop.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 .nav-glass {
   backdrop-filter: blur(22px) saturate(130%);
   -webkit-backdrop-filter: blur(22px) saturate(130%);
@@ -269,6 +290,20 @@ body {
 }
 
 @media (max-width: 640px) {
+  .scroll-reveal {
+    opacity: 0;
+    transform: translate3d(0, 1rem, 0);
+    transition:
+      opacity 520ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0s),
+      transform 520ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0s);
+    will-change: opacity, transform;
+  }
+
+  .scroll-reveal.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
   .site-grain {
     opacity: 0.032;
     background-size: 34px 34px;
@@ -374,6 +409,13 @@ body {
   }
 
   .galaxy-generated-background {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .scroll-reveal,
+  .scroll-reveal-desktop {
+    opacity: 1 !important;
     transform: none !important;
     transition: none !important;
   }
